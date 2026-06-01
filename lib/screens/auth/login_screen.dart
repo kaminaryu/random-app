@@ -33,6 +33,16 @@ class _LoginScreenState extends State<LoginScreen> {
     debugPrint('Forgot password tapped');
   }
 
+  String? _validateUsername(String? v) {
+    if (v == null || v.trim().isEmpty) return 'Required';
+    return null;
+  }
+
+  String? _validatePassword(String? v) {
+    if (v == null || v.length < 6) return 'At least 6 characters';
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
     return AuthPlaceholderScreen(
@@ -43,23 +53,24 @@ class _LoginScreenState extends State<LoginScreen> {
         key: _formKey,
         child: Column(
           children: [
+            // Username
             AuthTextField(
               controller: _usernameController,
-              label: 'Username',
+              label: 'Username or Email',
               icon: Icons.person_outline,
               autovalidateMode: AutovalidateMode.onUserInteraction,
-              validator: (v) =>
-                  v == null || v.trim().isEmpty ? 'Required' : null,
+              validator: _validateUsername,
             ),
             const SizedBox(height: 16),
+
+            // Password
             AuthPasswordField(
               controller: _passwordController,
               label: 'Password',
               textInputAction: TextInputAction.done,
               onSubmitted: (_) => _onSubmit(),
               autovalidateMode: AutovalidateMode.onUserInteraction,
-              validator: (v) =>
-                  v == null || v.length < 6 ? 'At least 6 characters' : null,
+              validator: _validatePassword,
             ),
           ],
         ),

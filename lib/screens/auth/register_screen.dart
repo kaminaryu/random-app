@@ -36,6 +36,28 @@ class _RegisterScreenState extends State<RegisterScreen> {
     debugPrint('Register: $name / $email / $password / $confirmPassword');
   }
 
+  String? _validateRequired(String? v) {
+    if (v == null || v.trim().isEmpty) return 'Required';
+    return null;
+  }
+
+  String? _validateEmail(String? v) {
+    if (v == null || v.isEmpty) return 'Required';
+    if (!EmailValidator.validate(v)) return 'Invalid email';
+    return null;
+  }
+
+  String? _validatePassword(String? v) {
+    if (v == null || v.length < 6) return 'At least 6 characters';
+    return null;
+  }
+
+  String? _validateConfirm(String? v) {
+    if (v == null || v.isEmpty) return 'Required';
+    if (v != _passwordController.text) return 'Passwords do not match';
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
     return AuthPlaceholderScreen(
@@ -45,49 +67,45 @@ class _RegisterScreenState extends State<RegisterScreen> {
         key: _formKey,
         child: Column(
           children: [
+            // Name
             AuthTextField(
               controller: _nameController,
               label: 'Full Name',
               icon: Icons.person_outline,
               autovalidateMode: AutovalidateMode.onUserInteraction,
-              validator: (v) =>
-                  v == null || v.trim().isEmpty ? 'Required' : null,
+              validator: _validateRequired,
             ),
             const SizedBox(height: 16),
+
+            // Email
             AuthTextField(
               controller: _emailController,
               label: 'Email',
               icon: Icons.email_outlined,
+              hintText: 'example@gmail.com',
               keyboardType: TextInputType.emailAddress,
               autovalidateMode: AutovalidateMode.onUserInteraction,
-              validator: (v) =>
-                  v != null && v.isNotEmpty && !EmailValidator.validate(v)
-                      ? 'Invalid email'
-                      : v == null || v.isEmpty
-                          ? 'Required'
-                          : null,
+              validator: _validateEmail,
             ),
             const SizedBox(height: 16),
+
+            // Password
             AuthPasswordField(
               controller: _passwordController,
               label: 'Password',
               autovalidateMode: AutovalidateMode.onUserInteraction,
-              validator: (v) =>
-                  v == null || v.length < 6 ? 'At least 6 characters' : null,
+              validator: _validatePassword,
             ),
             const SizedBox(height: 16),
+
+            // Confirm Password
             AuthPasswordField(
               controller: _confirmPasswordController,
               label: 'Confirm Password',
               textInputAction: TextInputAction.done,
               onSubmitted: (_) => _onSubmit(),
               autovalidateMode: AutovalidateMode.onUserInteraction,
-              validator: (v) =>
-                  v == null || v.isEmpty
-                      ? 'Required'
-                      : v != _passwordController.text
-                          ? 'Passwords do not match'
-                          : null,
+              validator: _validateConfirm,
             ),
           ],
         ),

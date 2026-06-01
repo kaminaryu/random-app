@@ -39,7 +39,8 @@ class AuthPlaceholderScreen extends StatelessWidget {
       submitText = "Login";
       changeScreenText = "Register instead";
       welcomeText = "Login to i-Bazaar";
-    } else {
+    } 
+    else {
       welcomeIcon = Icons.person_add_rounded;
       submitText = "Register";
       changeScreenText = "Login instead";
@@ -74,6 +75,7 @@ class AuthPlaceholderScreen extends StatelessWidget {
       ),
 
       body: Container(
+        // background gradient
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
@@ -95,6 +97,7 @@ class AuthPlaceholderScreen extends StatelessWidget {
               children: [
                 const SizedBox(height: 32),
 
+                // Welcome Icon
                 Icon(
                   welcomeIcon,
                   size: 72,
@@ -102,6 +105,7 @@ class AuthPlaceholderScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
 
+                // Welcome text
                 Text(
                   welcomeText,
                   textAlign: TextAlign.center,
@@ -114,6 +118,7 @@ class AuthPlaceholderScreen extends StatelessWidget {
 
                 formFields,
 
+                // For password button
                 if (screen == "login" && onForgotPassword != null)
                   Align(
                     alignment: Alignment.centerRight,
@@ -127,6 +132,7 @@ class AuthPlaceholderScreen extends StatelessWidget {
                   ? const SizedBox(height: 8)
                   : const SizedBox(height: 16),
 
+                // Submit button
                 FilledButton(
                   onPressed: onSubmit,
                   child: Padding(
@@ -136,6 +142,7 @@ class AuthPlaceholderScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
 
+                // Change Screen button
                 OutlinedButton(
                   onPressed: () => _onSwitchScreen(context),
                   child: Padding(
@@ -148,9 +155,11 @@ class AuthPlaceholderScreen extends StatelessWidget {
                 SectionTitle("Quick Sign-ins"),
                 const SizedBox(height: 12),
 
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                // Quick sign ins buttons
+                Wrap(
+                  alignment: WrapAlignment.center,
                   spacing: 16,
+                  runSpacing: 12,
                   children: [
                     _socialButton(FontAwesomeIcons.microsoft, () => Navigator.of(context).pop()),
                     _socialButton(FontAwesomeIcons.apple, () {}),
@@ -167,6 +176,7 @@ class AuthPlaceholderScreen extends StatelessWidget {
     );
   }
 }
+
 
 Widget _socialButton(FaIconData icon, VoidCallback action) {
   return OutlinedButton(

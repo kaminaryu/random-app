@@ -12,6 +12,7 @@ class AuthTextField extends StatelessWidget {
     this.onSubmitted,
     this.validator,
     this.autovalidateMode,
+    this.hintText,
   });
 
   final TextEditingController controller;
@@ -23,6 +24,7 @@ class AuthTextField extends StatelessWidget {
   final void Function(String)? onSubmitted;
   final String? Function(String?)? validator;
   final AutovalidateMode? autovalidateMode;
+  final String? hintText;
 
   @override
   Widget build(BuildContext context) {
@@ -36,6 +38,7 @@ class AuthTextField extends StatelessWidget {
       autovalidateMode: autovalidateMode,
       decoration: InputDecoration(
         labelText: label,
+        hintText: hintText,
         prefixIcon: Icon(icon),
         border: const OutlineInputBorder(),
       ),
