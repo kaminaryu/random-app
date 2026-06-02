@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:i_bazaar/screens/auth/auth_placeholder_screen.dart';
+import 'package:i_bazaar/services/prefs_service.dart';
 import 'package:i_bazaar/widgets/auth/auth_password_field.dart';
 import 'package:i_bazaar/widgets/auth/auth_text_field.dart';
 
@@ -24,9 +25,13 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void _onSubmit() {
     if (!_formKey.currentState!.validate()) return;
+
     final username = _usernameController.text.trim();
     final password = _passwordController.text;
     debugPrint('Login: $username / $password');
+
+    PrefsService.setLoggedIn(true);
+    Navigator.of(context).pop();
   }
 
   void _onForgotPassword() {

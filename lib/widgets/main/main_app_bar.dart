@@ -12,7 +12,7 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       backgroundColor: Color(0xFF5A189A),
  
-      // left side
+      // center
       title: TextButton(
         onPressed: () => context.go("/"),
         child: Text(
@@ -23,7 +23,7 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
           )
         ),
       ),
-      centerTitle: false,
+      centerTitle: true,
 
       // right side
       actions: [
