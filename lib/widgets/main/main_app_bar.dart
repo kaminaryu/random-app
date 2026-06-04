@@ -3,7 +3,7 @@ import 'package:go_router/go_router.dart';
 
 
 // PreferredSizeWidget is an interface that have fixed height
-// Must have for AppBar()
+// Must have for AppBar() and shi
 class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
   const MainAppBar({super.key});
 
@@ -38,11 +38,10 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
           child: Text("Login"),
         )
       ],
-
     );
   }
 
   @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
   // a getter, value calculated dynamically, like lambda func but looks like var
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }
