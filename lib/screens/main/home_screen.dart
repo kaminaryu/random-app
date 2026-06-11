@@ -13,12 +13,12 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final items = [
-    Item(name: "LightSaber (Red)", price: "6.70",  desc: "It works 100%",    seller: "Khazin", imgSrc: "red_lightsaber.png"),
-    Item(name: "Dragon Figurine",  price: "12.50", desc: "Rare collectible", seller: "Ali",    imgSrc: "dragon.png"),
-    Item(name: "Green Boulder",    price: "3.20",  desc: "Mysterious stone", seller: "Sara",   imgSrc: "green_boulder.png"),
-    Item(name: "Green Boulder",    price: "3.20",  desc: "Mysterious stone", seller: "Sara",   imgSrc: "green_boulder.png"),
-    Item(name: "Green Boulder",    price: "3.20",  desc: "Mysterious stone", seller: "Sara",   imgSrc: "green_boulder.png"),
-    Item(name: "Green Boulder",    price: "3.20",  desc: "Mysterious stone", seller: "Sara",   imgSrc: "green_boulder.png"),
+    Item(name: "LightSaber (Red)", price: "6.70",  desc: "It works 100%",    seller: "Khazin", stock: 12,  status: "Test",  imgSrc: "red_lightsaber.png"),
+    Item(name: "Dragon Figurine",  price: "12.50", desc: "Rare collectible", seller: "Ali",    stock: 54,  status: "Test",  imgSrc: "dragon.png"),
+    Item(name: "Green Boulder",    price: "3.20",  desc: "Mysterious stone", seller: "Sara",   stock: 234, status: "Test",  imgSrc: "green_boulder.png"),
+    Item(name: "Green Boulder",    price: "3.20",  desc: "Mysterious stone", seller: "Sara",   stock: 34,  status: "Test",  imgSrc: "green_boulder.png"),
+    Item(name: "Green Boulder",    price: "3.20",  desc: "Mysterious stone", seller: "Sara",   stock: 32,  status: "Test",  imgSrc: "green_boulder.png"),
+    Item(name: "Green Boulder",    price: "3.20",  desc: "Mysterious stone", seller: "Sara",   stock: 1,   status: "Test",  imgSrc: "green_boulder.png"),
   ];
 
   @override

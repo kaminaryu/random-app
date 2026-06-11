@@ -140,16 +140,14 @@ class _UserProfileState extends State<UserProfile> {
           children: [
             Text('App Theme', style: theme.textTheme.titleSmall),
             const SizedBox(height: 12),
-            SegmentedButton<ThemeMode>(
-              segments: const [
-                ButtonSegment(value: ThemeMode.light, icon: Icon(Icons.light_mode)),
-                ButtonSegment(value: ThemeMode.dark, icon: Icon(Icons.dark_mode)),
-                ButtonSegment(value: ThemeMode.system, icon: Icon(Icons.settings_brightness)),
+            Row(
+              children: [
+                Expanded(child: _themeOption(ThemeMode.light, Icons.light_mode, theme)),
+                const SizedBox(width: 8),
+                Expanded(child: _themeOption(ThemeMode.dark, Icons.dark_mode, theme)),
+                const SizedBox(width: 8),
+                Expanded(child: _themeOption(ThemeMode.system, Icons.settings_brightness, theme)),
               ],
-              selected: {_selectedTheme},
-              onSelectionChanged: (value) {
-                setState(() => _selectedTheme = value.first);
-              },
             ),
           ],
         ),
@@ -217,6 +215,29 @@ class _UserProfileState extends State<UserProfile> {
               foregroundColor: Colors.red,
               side: const BorderSide(color: Colors.red),
             ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _themeOption(ThemeMode mode, IconData icon, ThemeData theme) {
+    final selected = _selectedTheme == mode;
+    return Material(
+      color: selected
+          ? theme.colorScheme.primaryContainer
+          : theme.colorScheme.surfaceContainerHighest,
+      borderRadius: BorderRadius.circular(12),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: () => setState(() => _selectedTheme = mode),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 14),
+          child: Icon(
+            icon,
+            color: selected
+                ? theme.colorScheme.onPrimaryContainer
+                : theme.colorScheme.onSurface.withAlpha(128),
           ),
         ),
       ),

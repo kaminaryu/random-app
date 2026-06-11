@@ -35,7 +35,7 @@ class _MainNavBarState extends State<MainNavBar> {
       items: [
         BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
         BottomNavigationBarItem(icon: Icon(Icons.search), label: "Search"),
-        BottomNavigationBarItem(icon: Icon(Icons.sell), label: "Listings"),
+        BottomNavigationBarItem(icon: Icon(Icons.sell), label: "My Listings"),
         BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
       ],
     );

@@ -31,6 +31,7 @@ class ItemCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 8),
+
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -43,7 +44,7 @@ class ItemCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
                 Text(
-                  item.seller,
+                  item.seller!,
                   style: theme.textTheme.bodyMedium,
                 ),
                 Text(
