@@ -3,6 +3,7 @@ import 'package:i_bazaar/screens/auth/auth_placeholder_screen.dart';
 import 'package:i_bazaar/services/prefs_service.dart';
 import 'package:i_bazaar/widgets/auth/auth_password_field.dart';
 import 'package:i_bazaar/widgets/auth/auth_text_field.dart';
+import 'package:go_router/go_router.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -31,7 +32,7 @@ class _LoginScreenState extends State<LoginScreen> {
     debugPrint('Login: $username / $password');
 
     PrefsService.setLoggedIn(true);
-    Navigator.of(context).pop();
+    context.pop();
   }
 
   void _onForgotPassword() {

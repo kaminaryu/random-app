@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:i_bazaar/services/prefs_service.dart';
 
 
 // PreferredSizeWidget is an interface that have fixed height
@@ -27,15 +28,24 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
 
       // right side
       actions: [
-        ElevatedButton(
-          onPressed: () => context.push("/login"),
+        ValueListenableBuilder<bool>(
+          valueListenable: PrefsService.loginStatusNotifier,
+          builder: (context, loggedIn, child) {
+            if (loggedIn) {
+              return SizedBox.shrink();
+            }
 
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Color(0x67676767),
-            foregroundColor: Colors.white,
-          ),
+            return ElevatedButton(
+              onPressed: () => context.push("/login"),
 
-          child: Text("Login"),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color(0x67676767),
+                foregroundColor: Colors.white,
+              ),
+
+              child: Text("Login"),
+            );
+          }
         )
       ],
     );
