@@ -11,7 +11,7 @@ import 'package:i_bazaar/screens/main/profile_screen.dart';
 import 'package:i_bazaar/screens/main/search_screen.dart';
 
 final router = GoRouter(
-  initialLocation: "/home",
+  initialLocation: "/",
   routes: [
     GoRoute(path: "/login", builder: (_, __) => LoginScreen()),
     GoRoute(path: "/register", builder: (_, __) => RegisterScreen()),
@@ -27,7 +27,7 @@ final router = GoRouter(
     ShellRoute(
       builder: (context, state, child) => MainScreen(child: child),
       routes: [
-        GoRoute(path: "/home", builder:  (_, __) => HomeScreen()),
+        GoRoute(path: "/", builder:  (_, __) => HomeScreen()),
         GoRoute(path: "/search", builder:  (_, __) => SearchScreen()),
         GoRoute(path: "/chat", builder: (_, __) => ChatScreen()),
         GoRoute(path: "/listings", builder: (_, __) => ListingsScreen()),

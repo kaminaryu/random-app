@@ -13,7 +13,7 @@ class _MainNavBarState extends State<MainNavBar> {
 
   void changePage(int page) {
     switch (page) {
-      case 0: context.go("/home");
+      case 0: context.go("/");
       case 1: context.go("/search");
       case 2: context.go("/listings");
       case 3: context.go("/profile");
