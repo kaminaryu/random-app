@@ -38,6 +38,8 @@ dependencies:
   font_awesome_flutter: ^11.0.0
   email_validator: ^2.1.17
   shared_preferences: ^2.5.5
+  infinite_scroll_pagination: ^5.1.1
+  supabase_flutter: ^2.14.2
 
 dev_dependencies:
   flutter_test:

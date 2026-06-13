@@ -51,6 +51,26 @@ class ItemCard extends StatelessWidget {
                   "RM${item.price}",
                   style: theme.textTheme.bodySmall,
                 ),
+                Row(
+                  children: [
+                    for (var i = 0; i < 5; i++)
+                        Icon(
+                          i < item.rating.floor()
+                            ? Icons.star
+                            : ( item.rating % 1 >= 0.5 && i < item.rating.ceil())
+                              ? Icons.star_half
+                              : Icons.star_border,
+                          size: 12,
+                          color: Colors.amber,
+                        ),
+                    const SizedBox(width: 4),
+
+                    Text(
+                      item.rating.toStringAsFixed(1),
+                      style: theme.textTheme.bodySmall,
+                    ),
+                  ],
+                ),
               ],
             ),
           ),

@@ -25,7 +25,7 @@ class _HomeScreenState extends State<HomeScreen> {
             const gapBetweenImageAndText = 8.0;
             const crossAxisSpacing = 12.0;
             const mainAxisSpacing = 24.0;
-            const textBlockBaseHeight = 60.0;
+            const textBlockBaseHeight = 80.0;
 
             final widgetWidth = constraints.crossAxisExtent;
             final cardWidth = (widgetWidth - crossAxisPadding * 2 - crossAxisSpacing) / columnsCount;

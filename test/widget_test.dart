@@ -17,6 +17,6 @@ void main() {
     expect(find.text('Catalogs'), findsOneWidget);
 
     // Verify at least one mock item renders
-    expect(find.byType(GridView), findsOneWidget);
+    expect(find.byType(CustomScrollView), findsOneWidget);
   });
 }

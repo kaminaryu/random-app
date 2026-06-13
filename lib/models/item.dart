@@ -7,6 +7,7 @@ class Item {
     required this.stock,
     required this.status,
     required this.imgSrc,
+    this.rating = 0.0,
   });
 
   final String name;
@@ -16,4 +17,5 @@ class Item {
   final int stock;
   final String status;
   final String imgSrc;
+  final double rating;
 }
