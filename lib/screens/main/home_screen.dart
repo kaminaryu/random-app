@@ -43,8 +43,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   mainAxisExtent: cardHeight,
                 ),
                 delegate: SliverChildBuilderDelegate(
-                  (context, index) => ItemCard(MockingList.items[index]),
-                  childCount: MockingList.items.length,
+                  (context, index) => ItemCard(MockLists.items[index]),
+                  childCount: MockLists.items.length,
                 ),
               ),
             );

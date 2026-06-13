@@ -13,7 +13,7 @@ class _ListingsScreenState extends State<ListingsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: MockingList.items.isEmpty
+      body: MockLists.items.isEmpty
           ? Center(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -37,9 +37,9 @@ class _ListingsScreenState extends State<ListingsScreen> {
                 mainAxisExtent: 156,
                 mainAxisSpacing: 16,
               ),
-              itemCount: MockingList.items.length,
+              itemCount: MockLists.items.length,
               itemBuilder: (context, index) =>
-                  ListingCard(MockingList.items[index]),
+                  ListingCard(MockLists.items[index]),
             ),
     );
   }

@@ -1,6 +1,6 @@
 import 'package:i_bazaar/models/item.dart';
 
-class MockingList {
+class MockLists {
   static const items = [
       Item(name: "LightSaber (Red)", price: "6.70",  desc: "It works 100%",                                   seller: "Khazin", stock: 12,  status: "Private",    imgSrc: "red_lightsaber.png"),
       Item(name: "Dragon Figurine",  price: "12.50", desc: "Rare collectible",                                seller: "Ali",    stock: 54,  status: "Private",    imgSrc: "dragon.png"),
