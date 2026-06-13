@@ -44,7 +44,7 @@ class ItemCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
                 Text(
-                  item.seller!,
+                  item.seller,
                   style: theme.textTheme.bodyMedium,
                 ),
                 Text(

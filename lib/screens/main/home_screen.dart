@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:i_bazaar/models/item.dart';
+import 'package:i_bazaar/data/mock_lists.dart';
 import 'package:i_bazaar/widgets/homepage/hero.dart';
 import 'package:i_bazaar/widgets/homepage/item_card.dart';
 import 'package:i_bazaar/widgets/homepage/section_title.dart';
@@ -12,15 +12,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final items = [
-    Item(name: "LightSaber (Red)", price: "6.70",  desc: "It works 100%",    seller: "Khazin", stock: 12,  status: "Test",  imgSrc: "red_lightsaber.png"),
-    Item(name: "Dragon Figurine",  price: "12.50", desc: "Rare collectible", seller: "Ali",    stock: 54,  status: "Test",  imgSrc: "dragon.png"),
-    Item(name: "Green Boulder",    price: "3.20",  desc: "Mysterious stone", seller: "Sara",   stock: 234, status: "Test",  imgSrc: "green_boulder.png"),
-    Item(name: "Green Boulder",    price: "3.20",  desc: "Mysterious stone", seller: "Sara",   stock: 34,  status: "Test",  imgSrc: "green_boulder.png"),
-    Item(name: "Green Boulder",    price: "3.20",  desc: "Mysterious stone", seller: "Sara",   stock: 32,  status: "Test",  imgSrc: "green_boulder.png"),
-    Item(name: "Green Boulder",    price: "3.20",  desc: "Mysterious stone", seller: "Sara",   stock: 1,   status: "Test",  imgSrc: "green_boulder.png"),
-  ];
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -52,8 +43,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   mainAxisExtent: cardHeight,
                 ),
                 delegate: SliverChildBuilderDelegate(
-                  (context, index) => ItemCard(items[index]),
-                  childCount: items.length,
+                  (context, index) => ItemCard(MockingList.items[index]),
+                  childCount: MockingList.items.length,
                 ),
               ),
             );

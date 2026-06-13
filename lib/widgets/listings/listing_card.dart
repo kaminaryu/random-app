@@ -29,7 +29,7 @@ class ListingCard extends StatelessWidget {
                   'assets/items/${item.imgSrc}',
                   width: 120,
                   height: 120,
-                  fit: BoxFit.cover,
+                  fit: BoxFit.contain,
                 ),
               ),
               const SizedBox(width: 14),
@@ -127,7 +127,7 @@ class ListingCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
         decoration: BoxDecoration(
-          color: const Color(0xFF7F77DD),
+          color: item.status == "Public" ? const Color(0xFF00FF00) : const Color(0xFFFF0000),
           borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(12),
             bottomRight: Radius.circular(12),
@@ -136,7 +136,7 @@ class ListingCard extends StatelessWidget {
         child: Text(
           item.status,
           style: theme.textTheme.bodySmall?.copyWith(
-            color: Colors.white,
+            color:  Colors.white,
             fontWeight: FontWeight.w700,
             fontSize: 11,
           ),
