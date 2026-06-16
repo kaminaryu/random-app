@@ -109,12 +109,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
         CircleAvatar(
           radius: 36,
           backgroundColor: theme.colorScheme.primaryContainer,
-          child: Text(
-            _initials('John Doe'),
-            style: theme.textTheme.headlineMedium?.copyWith(
-              color: theme.colorScheme.onPrimaryContainer,
-              fontWeight: FontWeight.bold,
-            ),
+          child: Icon(
+            Icons.person,
+            color: theme.colorScheme.onPrimaryContainer,
+            size: 36,
           ),
         ),
         const SizedBox(width: 16),
@@ -123,14 +121,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'John Doe',
+                Supabase.instance.client.auth.currentUser?.userMetadata?["username"] ?? "John Doe",
                 style: theme.textTheme.titleLarge?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
               ),
               const SizedBox(height: 4),
               Text(
-                'john.doe@example.com',
+                Supabase.instance.client.auth.currentUser?.email ?? "example@mail.com",
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: theme.colorScheme.onSurface.withAlpha(153),
                 ),
@@ -261,13 +259,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  String _initials(String name) {
-    final parts = name.trim().split(' ').where((s) => s.isNotEmpty).toList();
-    if (parts.length >= 2) {
-      return '${parts.first[0]}${parts.last[0]}'.toUpperCase();
-    }
-    return name.isNotEmpty ? name[0].toUpperCase() : '?';
-  }
 
   void _showComingSoon(BuildContext context, String title) {
     showModalBottomSheet(
