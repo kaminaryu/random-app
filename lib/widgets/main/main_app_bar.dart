@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:i_bazaar/services/prefs_service.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 
 // PreferredSizeWidget is an interface that have fixed height
@@ -28,13 +28,25 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
 
       // right side
       actions: [
-        ValueListenableBuilder<bool>(
-          valueListenable: PrefsService.loginStatusNotifier,
-          builder: (context, loggedIn, child) {
+        StreamBuilder<AuthState>(
+          stream: Supabase.instance.client.auth.onAuthStateChange,
+          builder: (context, snapshot) {
+            bool loggedIn = false;
+
+            // check if the user is logged in
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              // if the user exist == logged in
+              loggedIn = (Supabase.instance.client.auth.currentUser != null);
+            }
+            else {
+              // if the data exist == logged in
+              loggedIn = (snapshot.data?.session != null);
+            }
+
+          // hide login button if user if loggedIN
             if (loggedIn) {
               return SizedBox.shrink();
             }
-
             return ElevatedButton(
               onPressed: () => context.push("/login"),
 

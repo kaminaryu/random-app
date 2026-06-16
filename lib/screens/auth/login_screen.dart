@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:i_bazaar/screens/auth/auth_placeholder_screen.dart';
-import 'package:i_bazaar/services/prefs_service.dart';
 import 'package:i_bazaar/widgets/auth/auth_password_field.dart';
 import 'package:i_bazaar/widgets/auth/auth_text_field.dart';
 import 'package:go_router/go_router.dart';
+import 'package:i_bazaar/widgets/auth/snack_bar.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -14,32 +15,83 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _usernameController = TextEditingController();
+  final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
   @override
   void dispose() {
-    _usernameController.dispose();
+    _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
 
+
   void _onSubmit() {
     if (!_formKey.currentState!.validate()) return;
 
-    final username = _usernameController.text.trim();
+    final email = _emailController.text.trim();
     final password = _passwordController.text;
-    debugPrint('Login: $username / $password');
+    debugPrint('Login: $email / $password');
 
-    PrefsService.setLoggedIn(true);
-    context.pop();
+    _signIn(email, password);
   }
+
+
+  Future<void> _signIn(String email, String password) async {
+    final messenger = ScaffoldMessenger.of(context);
+
+    try {
+      _signUpUser(email, password);
+    }
+    on AuthException catch (e) {
+      _handleException(e, messenger);
+    }
+  }
+
+  void _signUpUser(String email, String password) async {
+    final supabase = Supabase.instance.client;
+
+    await supabase.auth.signInWithPassword(
+      email: email,
+      password: password,
+    );
+
+    // check to see if the screen / widget is still moutned
+    if (mounted) {
+      context.pop();
+    }
+  }
+
+
+  void _handleException(AuthException err, ScaffoldMessengerState messenger) {
+    // TODO: add proper err message
+    String errorMessage = "";
+
+    switch (err.code) {
+      case "invalid_credentials" :
+        errorMessage = "Error: Email or Password is incorrect.";
+      case "user_not_found" || "user_banned" :
+        // even tho this is already handled, but we can still be safe right
+        errorMessage = "Error: User is either deleted or banned.";
+      case "over_request_rate_limit" :
+        errorMessage = "Error: Too many attempts. Try again in a few minutes.";
+      default :
+        errorMessage = "Error whilst trying to sign up. Please try again.";
+    }
+
+    AuthErrorSnackBar.show(messenger, errorMessage, Colors.red);
+
+    debugPrint("!! Log In  Error (Code) !!  ${err.code}");
+    debugPrint("!! Log In Error (Msg)  !!  ${err.message}");
+  }
+
+
 
   void _onForgotPassword() {
     debugPrint('Forgot password tapped');
   }
 
-  String? _validateUsername(String? v) {
+  String? _validateEmail(String? v) {
     if (v == null || v.trim().isEmpty) return 'Required';
     return null;
   }
@@ -59,13 +111,13 @@ class _LoginScreenState extends State<LoginScreen> {
         key: _formKey,
         child: Column(
           children: [
-            // Username
+            // Email
             AuthTextField(
-              controller: _usernameController,
-              label: 'Username or Email',
+              controller: _emailController,
+              label: 'Email',
               icon: Icons.person_outline,
               autovalidateMode: AutovalidateMode.onUserInteraction,
-              validator: _validateUsername,
+              validator: _validateEmail,
             ),
             const SizedBox(height: 16),
 

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:i_bazaar/services/prefs_service.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -14,14 +14,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<bool>(
-      valueListenable: PrefsService.loginStatusNotifier,
-      builder: (context, loggedIn, child) {
+    return StreamBuilder<AuthState>(
+      stream: Supabase.instance.client.auth.onAuthStateChange,
+      builder: (context, snapshot) {
+        bool loggedIn = false;
+
+        // check if the user is logged in
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          // if the user exist == logged in
+          loggedIn = (Supabase.instance.client.auth.currentUser != null);
+        }
+        else {
+          // if the data exist == logged in
+          loggedIn = (snapshot.data?.session != null);
+        }
+
+      // hide login button if user if loggedIN
         if (loggedIn) {
           return _buildSignedIn(context);
         }
         return _buildNotSignedIn(context);
-      },
+      }
     );
   }
 
@@ -206,11 +219,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: SizedBox(
           width: double.infinity,
           child: OutlinedButton.icon(
-            onPressed: () {
-              PrefsService.setLoggedIn(false);
-              // reset everything on screen
-              setState(() { });
-            },
+            onPressed: _logout,
             icon: const Icon(Icons.logout),
             label: const Text('Sign Out'),
             style: OutlinedButton.styleFrom(
@@ -221,6 +230,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
       ),
     );
+  }
+
+  void _logout() {
+    Supabase.instance.client.auth.signOut();
+    // reset everything on screen
+    setState(() { });
   }
 
   Widget _themeOption(ThemeMode mode, IconData icon, ThemeData theme) {
