@@ -41,6 +41,7 @@ dependencies:
   supabase_flutter: ^2.14.2
   flutter_dotenv: ^6.0.1
   flutter_image_compress: ^2.4.0
+  image_picker: ^1.2.2
 
 dev_dependencies:
   flutter_test:

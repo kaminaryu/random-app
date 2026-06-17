@@ -1,5 +1,3 @@
-import 'package:flutter/widgets.dart';
-
 class Item {
   const Item({
     required this.id,
@@ -40,6 +38,7 @@ class Item {
       stock:      row["stock"],
       isPublic:   row["is_public"],
       rating:     row["rating"],
+      amountSold: row["amount_sold"],
       createdAt:  DateTime.parse(row["item_created_at"]),
       sellerID:   row["user_profiles"]?["user_id"],
       sellerName: row["user_profiles"]?["user_name"] ?? "Unknown Seller",

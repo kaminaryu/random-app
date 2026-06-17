@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:i_bazaar/models/item.dart';
 import 'package:i_bazaar/services/catalog_handler.dart';
 import 'package:i_bazaar/widgets/listings/listing_card.dart';
@@ -52,9 +53,29 @@ class _ListingsScreenState extends State<ListingsScreen> {
     });
   }
 
+  Future<void> _refresh() async {
+    setState(() {
+      _items.clear();
+      _hasMore = true;
+    });
+    await _fetchNextPage();
+  }
+
+  Future<void> _navigateToCreate() async {
+    final created = await context.push<bool>('/create-listing');
+    if (created == true) {
+      _refresh();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        onPressed: _navigateToCreate,
+        backgroundColor: const Color(0xFF7F77DD),
+        child: const Icon(Icons.add),
+      ),
       body: _items.isEmpty && _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _items.isEmpty

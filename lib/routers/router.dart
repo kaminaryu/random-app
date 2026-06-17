@@ -3,6 +3,7 @@ import 'package:i_bazaar/screens/auth/register_screen.dart';
 import 'package:i_bazaar/screens/main/adspace_screen.dart';
 import 'package:i_bazaar/screens/main/chat_detail_screen.dart';
 import 'package:i_bazaar/screens/main/chat_screen.dart';
+import 'package:i_bazaar/screens/main/create_listing_screen.dart';
 import 'package:i_bazaar/screens/main/home_screen.dart';
 import 'package:i_bazaar/screens/auth/login_screen.dart';
 import 'package:i_bazaar/screens/main/listings_screen.dart';
@@ -16,6 +17,7 @@ final router = GoRouter(
     GoRoute(path: "/login", builder: (_, __) => LoginScreen()),
     GoRoute(path: "/register", builder: (_, __) => RegisterScreen()),
     GoRoute(path: "/adspace", builder: (_, __) => const AdspaceScreen()),
+    GoRoute(path: "/create-listing", builder: (_, __) => const CreateListingScreen()),
 
     GoRoute(
       path: "/chat/:conversationId",
