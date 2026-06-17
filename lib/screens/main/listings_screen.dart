@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:i_bazaar/data/mock_lists.dart';
+import 'package:i_bazaar/models/item.dart';
+import 'package:i_bazaar/services/catalog_handler.dart';
 import 'package:i_bazaar/widgets/listings/listing_card.dart';
 
 class ListingsScreen extends StatefulWidget {
@@ -10,37 +11,91 @@ class ListingsScreen extends StatefulWidget {
 }
 
 class _ListingsScreenState extends State<ListingsScreen> {
+  final _items = <Item>[];
+  bool _isLoading = false;
+  bool _hasMore = true;
+  static const _pageSize = 20;
+  final _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchNextPage();
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >=
+            _scrollController.position.maxScrollExtent - 200 &&
+        _hasMore &&
+        !_isLoading) {
+      _fetchNextPage();
+    }
+  }
+
+  Future<void> _fetchNextPage() async {
+    setState(() => _isLoading = true);
+    final start = _items.length;
+    final items =
+        await CatalogHandler.fetchRangedItems(start, start + _pageSize - 1);
+    if (!mounted) return;
+    setState(() {
+      if (items.length < _pageSize) _hasMore = false;
+      _items.addAll(items);
+      _isLoading = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: MockLists.items.isEmpty
-          ? Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Icons.inventory_2_outlined,
-                      size: 64, color: Colors.white38),
-                  const SizedBox(height: 16),
-                  Text(
-                    'No listings yet',
-                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                          color: Colors.white54,
-                        ),
+      body: _items.isEmpty && _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : _items.isEmpty
+              ? Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.inventory_2_outlined,
+                          size: 64, color: Colors.white38),
+                      const SizedBox(height: 16),
+                      Text(
+                        'No listings yet',
+                        style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                              color: Colors.white54,
+                            ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-            )
-          : GridView.builder(
-              padding: const EdgeInsets.all(16),
-              gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                maxCrossAxisExtent: double.infinity,
-                mainAxisExtent: 156,
-                mainAxisSpacing: 16,
-              ),
-              itemCount: MockLists.items.length,
-              itemBuilder: (context, index) =>
-                  ListingCard(MockLists.items[index]),
-            ),
+                )
+              : GridView.builder(
+                  controller: _scrollController,
+                  padding: const EdgeInsets.all(16),
+                  gridDelegate:
+                      const SliverGridDelegateWithMaxCrossAxisExtent(
+                    maxCrossAxisExtent: double.infinity,
+                    mainAxisExtent: 156,
+                    mainAxisSpacing: 16,
+                  ),
+                  itemCount: _items.length + (_hasMore ? 1 : 0),
+                  itemBuilder: (context, index) {
+                    if (index >= _items.length) {
+                      return const Center(
+                        child: Padding(
+                          padding: EdgeInsets.all(16),
+                          child: CircularProgressIndicator(),
+                        ),
+                      );
+                    }
+                    return ListingCard(_items[index]);
+                  },
+                ),
     );
   }
 }

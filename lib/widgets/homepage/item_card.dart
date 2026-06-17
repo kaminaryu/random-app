@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:i_bazaar/models/item.dart';
+import 'package:i_bazaar/services/catalog_handler.dart';
 
 class ItemCard extends StatelessWidget {
   const ItemCard(this.item, {super.key});
@@ -23,10 +24,17 @@ class ItemCard extends StatelessWidget {
             aspectRatio: 1.0,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(8),
-              child: Image.asset(
-                "assets/items/${item.imgSrc}",
+              child: Image.network(
+                CatalogHandler.fetchImageUrl("${item.sellerID}/${item.name}.jpg"),
                 width: double.infinity,
                 fit: BoxFit.contain,
+                loadingBuilder: (context, child, progress) {
+                  if (progress == null) return child;
+                  return const Center(child: CircularProgressIndicator());
+                },
+                errorBuilder: (context, error, stackTrace) {
+                  return const Icon(Icons.broken_image);
+                }
               ),
             ),
           ),
@@ -44,7 +52,7 @@ class ItemCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
                 Text(
-                  item.seller,
+                  item.sellerName,
                   style: theme.textTheme.bodyMedium,
                 ),
                 Text(

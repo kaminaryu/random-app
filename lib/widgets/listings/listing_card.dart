@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:i_bazaar/models/item.dart';
+import 'package:i_bazaar/services/catalog_handler.dart';
 
 class ListingCard extends StatelessWidget {
   const ListingCard(this.item, {super.key});
@@ -25,11 +26,18 @@ class ListingCard extends StatelessWidget {
               // ── Image ──
               ClipRRect(
                 borderRadius: BorderRadius.circular(12),
-                child: Image.asset(
-                  'assets/items/${item.imgSrc}',
+                child: Image.network(
+                  CatalogHandler.fetchImageUrl("${item.sellerID}/${item.name}.jpg"),
                   width: 120,
                   height: 120,
                   fit: BoxFit.contain,
+                  loadingBuilder: (context, child, progress) {
+                    if (progress == null) return child;
+                    return const Center(child: CircularProgressIndicator());
+                  },
+                  errorBuilder: (context, error, stackTrace) {
+                    return const Icon(Icons.broken_image);
+                  }
                 ),
               ),
               const SizedBox(width: 14),
@@ -55,7 +63,7 @@ class ListingCard extends StatelessWidget {
                           ),
                           const SizedBox(height: 2),
                           Text(
-                            '@${item.seller}',
+                            '@${item.sellerName}',
                             style: theme.textTheme.bodySmall?.copyWith(
                               color: const Color(0xFFCECBF6),
                             ),
@@ -127,14 +135,14 @@ class ListingCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
         decoration: BoxDecoration(
-          color: item.status == "Public" ? const Color(0xFF00FF00) : const Color(0xFFFF0000),
+          color: item.isPublic ? const Color(0xFF00FF00) : const Color(0xFFFF0000),
           borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(12),
             bottomRight: Radius.circular(12),
           ),
         ),
         child: Text(
-          item.status,
+          item.isPublic ? "Public" : "Private",
           style: theme.textTheme.bodySmall?.copyWith(
             color:  Colors.white,
             fontWeight: FontWeight.w700,

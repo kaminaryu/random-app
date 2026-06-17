@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-import 'package:i_bazaar/data/mock_lists.dart';
 import 'package:i_bazaar/models/item.dart';
+import 'package:i_bazaar/services/catalog_handler.dart';
 import 'package:i_bazaar/widgets/homepage/item_card.dart';
 
 enum SortOption { relevance, price, alpha, rating }
@@ -17,14 +17,13 @@ class _SearchScreenState extends State<SearchScreen> {
   final _searchController = TextEditingController();
 
   String _query = '';
+  double _minPrice = 0;
+  double _maxPrice = 0;
   RangeValues _priceRange = const RangeValues(0, 0);
   SortOption _sortBy = SortOption.relevance;
   bool _ascending = true;
-  List<Item> _allFilteredItems = [];
+  bool _rangeLoaded = false;
   var _hasSearched = false;
-
-  late double _minPrice;
-  late double _maxPrice;
 
   static const _pageSize = 6;
 
@@ -34,15 +33,23 @@ class _SearchScreenState extends State<SearchScreen> {
   );
 
   int? _getNextPageKey(PagingState<int, Item> state) {
-    if (state.pages == null) return 0;
+    if (state.pages == null || state.pages!.isEmpty) return 0;
+    final lastPage = state.pages!.last;
+    if (lastPage.length < _pageSize) return null;
     final fetchedCount = state.pages!.fold(0, (sum, p) => sum + p.length);
-    if (fetchedCount >= _allFilteredItems.length) return null;
     return fetchedCount;
   }
 
   Future<List<Item>> _fetchPage(int pageKey) async {
-    final end = (pageKey + _pageSize).clamp(0, _allFilteredItems.length);
-    return _allFilteredItems.sublist(pageKey, end);
+    return CatalogHandler.searchRangedItems(
+      query: _query.isEmpty ? null : _query,
+      priceMin: _rangeLoaded ? _priceRange.start : null,
+      priceMax: _rangeLoaded ? _priceRange.end : null,
+      sortBy: _sortBy == SortOption.relevance ? null : _sortBy.name,
+      ascending: _ascending,
+      start: pageKey,
+      end: pageKey + _pageSize - 1,
+    );
   }
 
   @override
@@ -54,11 +61,15 @@ class _SearchScreenState extends State<SearchScreen> {
     _initPriceRange();
   }
 
-  void _initPriceRange() {
-    final prices = MockLists.items.map((i) => double.parse(i.price));
-    _minPrice = prices.reduce((a, b) => a < b ? a : b);
-    _maxPrice = prices.reduce((a, b) => a > b ? a : b);
-    _priceRange = RangeValues(_minPrice, _maxPrice);
+  Future<void> _initPriceRange() async {
+    final range = await CatalogHandler.fetchPriceRange();
+    if (!mounted) return;
+    setState(() {
+      _minPrice = range.min;
+      _maxPrice = range.max;
+      _priceRange = RangeValues(range.min, range.max);
+      _rangeLoaded = true;
+    });
   }
 
   @override
@@ -71,69 +82,11 @@ class _SearchScreenState extends State<SearchScreen> {
   void _performSearch() {
     _query = _searchController.text.trim();
     _hasSearched = true;
-    _applyFilters();
-  }
-
-  void _applyFilters() {
-    _allFilteredItems = MockLists.items.where((item) {
-      if (_query.isNotEmpty) {
-        final q = _query.toLowerCase();
-        if (!item.name.toLowerCase().contains(q) &&
-            !item.desc.toLowerCase().contains(q) &&
-            !item.seller.toLowerCase().contains(q)) {
-          return false;
-        }
-      }
-      final price = double.parse(item.price);
-      return price >= _priceRange.start && price <= _priceRange.end;
-    }).toList();
-
-    _sortItems(_allFilteredItems);
     _pagingController.refresh();
   }
 
-  void _sortItems(List<Item> items) {
-    switch (_sortBy) {
-      case SortOption.relevance:
-        items.sort((a, b) => _relevanceScore(b).compareTo(_relevanceScore(a)));
-      case SortOption.price:
-        items.sort((a, b) => _ascending
-            ? double.parse(a.price).compareTo(double.parse(b.price))
-            : double.parse(b.price).compareTo(double.parse(a.price)));
-      case SortOption.alpha:
-        items.sort((a, b) => _ascending
-            ? a.name.toLowerCase().compareTo(b.name.toLowerCase())
-            : b.name.toLowerCase().compareTo(a.name.toLowerCase()));
-      case SortOption.rating:
-        items.sort((a, b) => b.rating.compareTo(a.rating));
-    }
-  }
-
-  int _relevanceScore(Item item) {
-    if (_query.isEmpty) return 0;
-
-    final q = _query.toLowerCase();
-    final name = item.name.toLowerCase();
-    final desc = item.desc.toLowerCase();
-    final seller = item.seller.toLowerCase();
-    int score = 0;
-
-    // check in name first
-    if (name == q) {
-      score += 10;
-    } else if (name.startsWith(q)) {
-      score += 7;
-    } else if (name.contains(q)) {
-      score += 5;
-    }
-
-    // check if desc have it
-    if (desc.contains(q)) score += 3;
-
-    // check if the seller 
-    if (seller.contains(q)) score += 2;
-
-    return score;
+  void _submitFilters() {
+    _pagingController.refresh();
   }
 
   void _showFilterSortSheet() {
@@ -200,7 +153,7 @@ class _SearchScreenState extends State<SearchScreen> {
                           _sortBy = tempSort;
                           _ascending = tempAscending;
                         });
-                        _applyFilters();
+                        _submitFilters();
                         Navigator.pop(context);
                       },
                       child: const Text('Apply'),
