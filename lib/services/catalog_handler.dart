@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:i_bazaar/models/item.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -18,7 +17,6 @@ class CatalogHandler {
   }
 
   static String fetchImageUrl(String path) {
-    debugPrint("Image Url: $path");
     return supabase.storage.from("catalog-images").getPublicUrl(path);
   }
 

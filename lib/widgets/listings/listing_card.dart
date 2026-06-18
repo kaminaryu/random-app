@@ -16,7 +16,7 @@ class ListingCard extends StatelessWidget {
       children: [
         Container(
           decoration: BoxDecoration(
-            color: const Color(0xFF2D2A5E),
+            color: theme.colorScheme.primary,
             borderRadius: BorderRadius.circular(16),
           ),
           padding: const EdgeInsets.all(12),

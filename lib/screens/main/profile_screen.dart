@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:i_bazaar/widgets/profile/theme_card.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -10,22 +11,22 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  ThemeMode _selectedTheme = ThemeMode.system;
+  final SupabaseClient supabase = Supabase.instance.client;
 
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<AuthState>(
-      stream: Supabase.instance.client.auth.onAuthStateChange,
+      stream: supabase.auth.onAuthStateChange,
       builder: (context, snapshot) {
         bool loggedIn = false;
 
         // check if the user is logged in
         if (snapshot.connectionState == ConnectionState.waiting) {
-          // if the user exist == logged in
-          loggedIn = (Supabase.instance.client.auth.currentUser != null);
+          // if connection still not resolve, put loading screen
+          return _buildLoading(context);
         }
         else {
-          // if the data exist == logged in
+          // if finished loading, check if user sess exist
           loggedIn = (snapshot.data?.session != null);
         }
 
@@ -36,6 +37,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
         return _buildNotSignedIn(context);
       }
     );
+  }
+
+  Widget _buildLoading(BuildContext context) {
+    return Center(child: CircularProgressIndicator());
   }
 
   Widget _buildNotSignedIn(BuildContext context) {
@@ -84,21 +89,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget _buildSignedIn(BuildContext context) {
     final theme = Theme.of(context);
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildHero(theme),
-          const SizedBox(height: 28),
-          _buildThemeCard(theme),
-          const SizedBox(height: 12),
-          _buildAdspaceCard(theme),
-          const SizedBox(height: 12),
-          _buildInfoCard(theme),
-          const SizedBox(height: 12),
-          _buildLogoutCard(theme),
-        ],
+    return Container(
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+      ),
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildHero(theme),
+            const SizedBox(height: 28),
+            ThemeCard(theme),
+            const SizedBox(height: 12),
+            _buildAdspaceCard(theme),
+            const SizedBox(height: 12),
+            _buildInfoCard(theme),
+            const SizedBox(height: 12),
+            _buildLogoutCard(theme),
+          ],
+        ),
       ),
     );
   }
@@ -121,14 +131,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                Supabase.instance.client.auth.currentUser?.userMetadata?["username"] ?? "John Doe",
+                supabase.auth.currentUser?.userMetadata?["username"] ?? "John Doe",
                 style: theme.textTheme.titleLarge?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
               ),
               const SizedBox(height: 4),
               Text(
-                Supabase.instance.client.auth.currentUser?.email ?? "example@mail.com",
+                supabase.auth.currentUser?.email ?? "example@mail.com",
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: theme.colorScheme.onSurface.withAlpha(153),
                 ),
@@ -140,30 +150,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildThemeCard(ThemeData theme) {
-    return Card(
-      clipBehavior: Clip.antiAlias,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('App Theme', style: theme.textTheme.titleSmall),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(child: _themeOption(ThemeMode.light, Icons.light_mode, theme)),
-                const SizedBox(width: 8),
-                Expanded(child: _themeOption(ThemeMode.dark, Icons.dark_mode, theme)),
-                const SizedBox(width: 8),
-                Expanded(child: _themeOption(ThemeMode.system, Icons.settings_brightness, theme)),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+
 
   Widget _buildAdspaceCard(ThemeData theme) {
     return Card(
@@ -186,7 +173,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             leading: const Icon(Icons.privacy_tip_outlined),
             title: const Text('Privacy Policy'),
             trailing: const Icon(Icons.chevron_right),
-            onTap: () => _showComingSoon(context, 'Privacy Policy'),
+            onTap: () => {},
           ),
           const Divider(height: 1, indent: 56),
 
@@ -194,7 +181,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             leading: const Icon(Icons.description_outlined),
             title: const Text('Terms of Service'),
             trailing: const Icon(Icons.chevron_right),
-            onTap: () => _showComingSoon(context, 'Terms of Service'),
+            onTap: () => {},
           ),
           const Divider(height: 1, indent: 56),
 
@@ -202,7 +189,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             leading: const Icon(Icons.help_outline),
             title: const Text('Help Center'),
             trailing: const Icon(Icons.chevron_right),
-            onTap: () => _showComingSoon(context, 'Help Center'),
+            onTap: () => {},
           ),
         ],
       ),
@@ -231,50 +218,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   void _logout() {
-    Supabase.instance.client.auth.signOut();
+    supabase.auth.signOut();
     // reset everything on screen
     setState(() { });
   }
 
-  Widget _themeOption(ThemeMode mode, IconData icon, ThemeData theme) {
-    final selected = _selectedTheme == mode;
-    return Material(
-      color: selected
-          ? theme.colorScheme.primaryContainer
-          : theme.colorScheme.surfaceContainerHighest,
-      borderRadius: BorderRadius.circular(12),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(12),
-        onTap: () => setState(() => _selectedTheme = mode),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 14),
-          child: Icon(
-            icon,
-            color: selected
-                ? theme.colorScheme.onPrimaryContainer
-                : theme.colorScheme.onSurface.withAlpha(128),
-          ),
-        ),
-      ),
-    );
-  }
-
-
-  void _showComingSoon(BuildContext context, String title) {
-    showModalBottomSheet(
-      context: context,
-      builder: (_) => Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(title, style: Theme.of(context).textTheme.titleLarge),
-            const SizedBox(height: 16),
-            const Text('Coming soon.'),
-            const SizedBox(height: 24),
-          ],
-        ),
-      ),
-    );
-  }
+  
 }

@@ -55,7 +55,6 @@ class _HomeScreenState extends State<HomeScreen> {
               final cardHeight = cardWidth + gapBetweenImageAndText + textBlockHeight;
 
 
-
               return SliverPadding(
                 padding: EdgeInsets.symmetric(horizontal: crossAxisPadding, vertical: mainAxisSpacing),
                 sliver: SliverGrid(
