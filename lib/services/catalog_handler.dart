@@ -4,12 +4,24 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 class CatalogHandler {
   static final supabase = Supabase.instance.client;
 
-  static Future<List<Item>> fetchRangedItems(int start, int end) async {
-    final response = await supabase
-      .from("catalog")
-      .select("*, user_profiles(*)")
-      .order('item_created_at', ascending: false)
-      .range(start, end);
+  static Future<List<Item>> fetchRangedItems({required int start, required int end, String? userID}) async {
+    final List<Map<String, dynamic>> response;
+
+    if (userID != null) {
+      response = await supabase
+        .from("catalog")
+        .select("*, user_profiles(*)")
+        .eq("user_id", userID)
+        .order('item_created_at', ascending: false)
+        .range(start, end);
+    }
+    else {
+      response = await supabase
+        .from("catalog")
+        .select("*, user_profiles(*)")
+        .order('item_created_at', ascending: false)
+        .range(start, end);
+    }
 
     return (response as List)
       .map((row) => Item.fromMap(row))

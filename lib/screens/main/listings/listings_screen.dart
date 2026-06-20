@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:i_bazaar/models/item.dart';
 import 'package:i_bazaar/services/catalog_handler.dart';
 import 'package:i_bazaar/screens/main/listings/listing_card.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ListingsScreen extends StatefulWidget {
   const ListingsScreen({super.key});
@@ -43,8 +44,14 @@ class _ListingsScreenState extends State<ListingsScreen> {
   Future<void> _fetchNextPage() async {
     setState(() => _isLoading = true);
     final start = _items.length;
+    final user = Supabase.instance.client.auth.currentUser;
+
     final items =
-        await CatalogHandler.fetchRangedItems(start, start + _pageSize - 1);
+        await CatalogHandler.fetchRangedItems(
+          start: start,
+          end: start + _pageSize - 1,
+          userID: user!.id,
+        );
     if (!mounted) return;
     setState(() {
       if (items.length < _pageSize) _hasMore = false;
@@ -70,6 +77,33 @@ class _ListingsScreenState extends State<ListingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (_items.isEmpty) {
+      return Scaffold(
+        floatingActionButton: FloatingActionButton(
+          onPressed: _navigateToCreate,
+          backgroundColor: const Color(0xFF7F77DD),
+          child: const Icon(Icons.add),
+        ),
+
+        body: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text("You have no listed product."),
+              TextButton(
+                onPressed: () {},
+                child: Text(
+                  "Upload one now!",
+                  style: TextStyle(decoration: TextDecoration.underline),
+                ),
+              ),
+            ],
+          )
+        )
+      );
+    }
+
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: _navigateToCreate,

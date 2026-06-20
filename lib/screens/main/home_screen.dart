@@ -22,7 +22,10 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> fetchCatalog() async {
-    final result = await CatalogHandler.fetchRangedItems(0, 10);
+    final result = await CatalogHandler.fetchRangedItems(
+      start: 0,
+      end: 10,
+    );
     setState(() {
       catalog = result;
       isLoading = false;
