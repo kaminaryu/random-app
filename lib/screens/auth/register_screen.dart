@@ -48,7 +48,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     final messenger = ScaffoldMessenger.of(context);
 
     try {
-      _signUpUser(name, email, password);
+      await _signUpUser(name, email, password);
     }
     on AuthException catch (e) {
       _handleException(e, messenger);
@@ -56,7 +56,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
 
-  void _signUpUser(String name, String email, String password) async {
+  Future<void> _signUpUser(String name, String email, String password) async {
     final supabase = Supabase.instance.client;
 
     await supabase.auth.signUp(

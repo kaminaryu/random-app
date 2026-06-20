@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:i_bazaar/models/item.dart';
 import 'package:i_bazaar/services/catalog_handler.dart';
 import 'package:i_bazaar/screens/main/listings/listing_card.dart';
+import 'package:i_bazaar/widgets/not_signed_in_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ListingsScreen extends StatefulWidget {
@@ -45,12 +46,13 @@ class _ListingsScreenState extends State<ListingsScreen> {
     setState(() => _isLoading = true);
     final start = _items.length;
     final user = Supabase.instance.client.auth.currentUser;
+    if (user == null) return;
 
     final items =
         await CatalogHandler.fetchRangedItems(
           start: start,
           end: start + _pageSize - 1,
-          userID: user!.id,
+          userID: user.id,
         );
     if (!mounted) return;
     setState(() {
@@ -75,13 +77,12 @@ class _ListingsScreenState extends State<ListingsScreen> {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    if (_items.isEmpty) {
+  Widget _buildListings() {
+    if (_items.isEmpty && !_isLoading) {
       return Scaffold(
         floatingActionButton: FloatingActionButton(
           onPressed: _navigateToCreate,
-          backgroundColor: const Color(0xFF7F77DD),
+          backgroundColor: Theme.of(context).colorScheme.primary,
           child: const Icon(Icons.add),
         ),
 
@@ -151,6 +152,22 @@ class _ListingsScreenState extends State<ListingsScreen> {
                   return ListingCard(_items[index], refreshScreen: _refresh);
                 },
               ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<AuthState>(
+      stream: Supabase.instance.client.auth.onAuthStateChange,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        if (snapshot.data?.session == null) {
+          return const NotSignedInScreen();
+        }
+        return _buildListings();
+      },
     );
   }
 }

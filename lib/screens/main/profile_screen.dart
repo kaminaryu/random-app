@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:i_bazaar/widgets/not_signed_in_screen.dart';
 import 'package:i_bazaar/widgets/profile/theme_card.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -34,59 +35,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
         if (loggedIn) {
           return _buildSignedIn(context);
         }
-        return _buildNotSignedIn(context);
+        return NotSignedInScreen();
       }
     );
   }
 
   Widget _buildLoading(BuildContext context) {
     return Center(child: CircularProgressIndicator());
-  }
-
-  Widget _buildNotSignedIn(BuildContext context) {
-    final theme = Theme.of(context);
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 32),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.person_outline,
-              size: 96,
-              color: theme.colorScheme.onSurface.withAlpha(102),
-            ),
-            const SizedBox(height: 24),
-
-            Text(
-              'Not yet signed in',
-              style: theme.textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const SizedBox(height: 8),
-
-            Text(
-              'Sign in to access your profile and settings.',
-              textAlign: TextAlign.center,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurface.withAlpha(153),
-              ),
-            ),
-            const SizedBox(height: 32),
-
-            FilledButton.icon(
-              onPressed: () async {
-                await context.push('/login');
-                if (mounted) setState(() {});
-              },
-              icon: const Icon(Icons.login),
-              label: const Text('Sign In'),
-            ),
-          ],
-        ),
-      ),
-    );
   }
 
   Widget _buildSignedIn(BuildContext context) {

@@ -41,14 +41,14 @@ class _LoginScreenState extends State<LoginScreen> {
     final messenger = ScaffoldMessenger.of(context);
 
     try {
-      _signUpUser(email, password);
+      await _signInUser(email, password);
     }
     on AuthException catch (e) {
       _handleException(e, messenger);
     }
   }
 
-  void _signUpUser(String email, String password) async {
+  Future<void> _signInUser(String email, String password) async {
     final supabase = Supabase.instance.client;
 
     await supabase.auth.signInWithPassword(

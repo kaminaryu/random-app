@@ -20,11 +20,10 @@ class ListingHandler {
   })
   async {
     final user = supabase.auth.currentUser;
-    if (user == null) throw Exception('Not signed in');
 
     final itemID = const Uuid().v4();
 
-    final sellerId = user.id;
+    final sellerId = user!.id;
     final imagePath = '$sellerId/$itemID.jpg';
 
     await supabase.storage.from("catalog-images").upload(
@@ -73,9 +72,8 @@ class ListingHandler {
   })
   async {
     final user = supabase.auth.currentUser;
-    if (user == null) throw Exception('Not signed in');
 
-    final sellerId = user.id;
+    final sellerId = user!.id;
     final imagePath = '$sellerId/$itemID.jpg';
 
     if (imageFile != null) {
