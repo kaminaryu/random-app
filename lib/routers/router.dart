@@ -1,9 +1,11 @@
 import 'package:go_router/go_router.dart';
+import 'package:i_bazaar/models/item.dart';
 import 'package:i_bazaar/screens/auth/register_screen.dart';
 import 'package:i_bazaar/screens/main/adspace_screen.dart';
 import 'package:i_bazaar/screens/main/chat_detail_screen.dart';
 import 'package:i_bazaar/screens/main/chat_screen.dart';
 import 'package:i_bazaar/screens/main/create_listing/create_listing_screen.dart';
+import 'package:i_bazaar/screens/main/edit_listing/edit_listing_screen.dart';
 import 'package:i_bazaar/screens/main/home_screen.dart';
 import 'package:i_bazaar/screens/auth/login_screen.dart';
 import 'package:i_bazaar/screens/main/listings/listings_screen.dart';
@@ -14,14 +16,18 @@ import 'package:i_bazaar/screens/main/search_screen.dart';
 final router = GoRouter(
   initialLocation: "/",
   routes: [
-    GoRoute(path: "/login", builder: (_, __) => LoginScreen()),
-    GoRoute(path: "/register", builder: (_, __) => RegisterScreen()),
-    GoRoute(path: "/adspace", builder: (_, __) => const AdspaceScreen()),
-    GoRoute(path: "/create-listing", builder: (_, __) => const CreateListingScreen()),
+    GoRoute(path: "/login", builder: (context, state) => LoginScreen()),
+    GoRoute(path: "/register", builder: (context, state) => RegisterScreen()),
+    GoRoute(path: "/adspace", builder: (context, state) => const AdspaceScreen()),
+    GoRoute(path: "/create-listing", builder: (context, state) => const CreateListingScreen()),
+    GoRoute(path: "/edit-listing", builder: (context, state) {
+      final item = state.extra as Item;
+      return EditListingScreen(item);
+    }),
 
     GoRoute(
       path: "/chat/:conversationId",
-      builder: (_, state) => ChatDetailScreen(
+      builder: (context, state) => ChatDetailScreen(
         conversationId: state.pathParameters['conversationId']!,
       ),
     ),
@@ -29,11 +35,11 @@ final router = GoRouter(
     ShellRoute(
       builder: (context, state, child) => MainScreen(child: child),
       routes: [
-        GoRoute(path: "/", builder:  (_, __) => HomeScreen()),
-        GoRoute(path: "/search", builder:  (_, __) => SearchScreen()),
-        GoRoute(path: "/chat", builder: (_, __) => ChatScreen()),
-        GoRoute(path: "/listings", builder: (_, __) => ListingsScreen()),
-        GoRoute(path: "/profile", builder: (_, __) => ProfileScreen()),
+        GoRoute(path: "/", builder:  (context, state) => HomeScreen()),
+        GoRoute(path: "/search", builder:  (context, state) => SearchScreen()),
+        GoRoute(path: "/chat", builder: (context, state) => ChatScreen()),
+        GoRoute(path: "/listings", builder: (context, state) => ListingsScreen()),
+        GoRoute(path: "/profile", builder: (context, state) => ProfileScreen()),
     ])
   ]
 );

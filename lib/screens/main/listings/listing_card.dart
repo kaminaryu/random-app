@@ -1,11 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:i_bazaar/models/item.dart';
 import 'package:i_bazaar/services/catalog_handler.dart';
 
 class ListingCard extends StatelessWidget {
-  const ListingCard(this.item, {super.key});
+  const ListingCard(this.item, {super.key, required this.refreshScreen});
 
   final Item item;
+  final VoidCallback refreshScreen;
+
+  void _goToEditScreen(BuildContext context) async {
+    final success = await context.push<bool>("/edit-listing", extra: item);
+
+    if (success == true) {
+      refreshScreen.call();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,25 +33,6 @@ class ListingCard extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // ── Image ──
-              // ClipRRect(
-              //   borderRadius: BorderRadius.circular(12),
-              //   child: Image.network(
-              //     CatalogHandler.fetchImageUrl("${item.sellerID}/${item.name}.jpg"),
-              //     width: 120,
-              //     height: 120,
-              //     fit: BoxFit.contain,
-              //     loadingBuilder: (context, child, progress) {
-              //       if (progress == null) return child;
-              //       return const Center(child: CircularProgressIndicator());
-              //     },
-              //     errorBuilder: (context, error, stackTrace) {
-              //       return const Icon(Icons.broken_image);
-              //     }
-              //   ),
-              // ),
-              //
-
               ClipRRect(
                 borderRadius: BorderRadius.circular(16),
                 child: SizedBox(
@@ -49,7 +40,7 @@ class ListingCard extends StatelessWidget {
                   height: 120,
 
                   child: Image.network(
-                    CatalogHandler.fetchImageUrl("${item.sellerID}/${item.name}.jpg"),
+                    CatalogHandler.fetchImageUrl("${item.sellerID}/${item.id}.jpg"),
                     width: 120,
                     height: 120,
                     fit: BoxFit.contain,
@@ -91,6 +82,7 @@ class ListingCard extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                           ),
                           const SizedBox(height: 2),
+
                           Text(
                             '@${item.sellerName}',
                             style: theme.textTheme.bodySmall?.copyWith(
@@ -98,6 +90,7 @@ class ListingCard extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(height: 4),
+
                           Text(
                             item.desc,
                             style: theme.textTheme.bodySmall?.copyWith(
@@ -129,7 +122,7 @@ class ListingCard extends StatelessWidget {
                             ),
 
                             child: IconButton(
-                              onPressed: () {},
+                              onPressed: () => _goToEditScreen(context),
                               icon: Icon(
                                 Icons.edit,
                                 size: 14,
@@ -162,7 +155,7 @@ class ListingCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
         decoration: BoxDecoration(
-          color: item.isPublic ? const Color(0xFF00FF00) : const Color(0xFFFF0000),
+          color: item.isPublic ? const Color(0xFF00AA00) : const Color(0xFFAA0000),
           borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(12),
             bottomRight: Radius.circular(12),

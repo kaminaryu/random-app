@@ -25,7 +25,7 @@ class ItemCard extends StatelessWidget {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(8),
               child: Image.network(
-                CatalogHandler.fetchImageUrl("${item.sellerID}/${item.name}.jpg"),
+                CatalogHandler.fetchImageUrl("${item.sellerID}/${item.id}.jpg"),
                 width: double.infinity,
                 fit: BoxFit.contain,
                 loadingBuilder: (context, child, progress) {

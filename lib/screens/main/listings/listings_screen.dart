@@ -27,8 +27,8 @@ class _ListingsScreenState extends State<ListingsScreen> {
 
   @override
   void dispose() {
-    _scrollController.dispose();
     super.dispose();
+    _scrollController.dispose();
   }
 
   void _onScroll() {
@@ -79,44 +79,44 @@ class _ListingsScreenState extends State<ListingsScreen> {
       body: _items.isEmpty && _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _items.isEmpty
-              ? Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.inventory_2_outlined,
-                          size: 64, color: Colors.white38),
-                      const SizedBox(height: 16),
-                      Text(
-                        'No listings yet',
-                        style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                              color: Colors.white54,
-                            ),
-                      ),
-                    ],
-                  ),
-                )
-              : GridView.builder(
-                  controller: _scrollController,
-                  padding: const EdgeInsets.all(16),
-                  gridDelegate:
-                      const SliverGridDelegateWithMaxCrossAxisExtent(
-                    maxCrossAxisExtent: double.infinity,
-                    mainAxisExtent: 156,
-                    mainAxisSpacing: 16,
-                  ),
-                  itemCount: _items.length + (_hasMore ? 1 : 0),
-                  itemBuilder: (context, index) {
-                    if (index >= _items.length) {
-                      return const Center(
-                        child: Padding(
-                          padding: EdgeInsets.all(16),
-                          child: CircularProgressIndicator(),
-                        ),
-                      );
-                    }
-                    return ListingCard(_items[index]);
-                  },
+            ? Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.inventory_2_outlined,
+                        size: 64, color: Colors.white38),
+                    const SizedBox(height: 16),
+                    Text(
+                      'No listings yet',
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                            color: Colors.white54,
+                          ),
+                    ),
+                  ],
                 ),
+              )
+            : GridView.builder(
+                controller: _scrollController,
+                padding: const EdgeInsets.all(16),
+                gridDelegate:
+                    const SliverGridDelegateWithMaxCrossAxisExtent(
+                  maxCrossAxisExtent: double.infinity,
+                  mainAxisExtent: 156,
+                  mainAxisSpacing: 16,
+                ),
+                itemCount: _items.length + (_hasMore ? 1 : 0),
+                itemBuilder: (context, index) {
+                  if (index >= _items.length) {
+                    return const Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(16),
+                        child: CircularProgressIndicator(),
+                      ),
+                    );
+                  }
+                  return ListingCard(_items[index], refreshScreen: _refresh);
+                },
+              ),
     );
   }
 }

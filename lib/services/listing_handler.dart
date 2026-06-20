@@ -1,13 +1,15 @@
 import 'dart:io';
 
-import 'package:i_bazaar/models/item.dart';
+// import 'package:i_bazaar/models/item.dart';
+import 'package:flutter/widgets.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:uuid/uuid.dart';
 
 class ListingHandler {
   static final supabase = Supabase.instance.client;
 
-  static Future<Item> createListing({
+  static Future<void> createListing({
     required String name,
     required double price,
     required String desc,
@@ -15,12 +17,15 @@ class ListingHandler {
     required int stock,
     required bool isPublic,
     required XFile imageFile,
-  }) async {
+  })
+  async {
     final user = supabase.auth.currentUser;
     if (user == null) throw Exception('Not signed in');
 
+    final itemID = const Uuid().v4();
+
     final sellerId = user.id;
-    final imagePath = '$sellerId/$name.jpg';
+    final imagePath = '$sellerId/$itemID.jpg';
 
     await supabase.storage.from("catalog-images").upload(
       imagePath,
@@ -28,16 +33,86 @@ class ListingHandler {
       fileOptions: const FileOptions(contentType: 'image/jpeg'),
     );
 
-    final response = await supabase.from("catalog").insert({
-      "item_name": name,
-      "price": price,
-      "desc": desc,
-      "short_desc": shortDesc,
-      "stock": stock,
-      "is_public": isPublic,
-      "user_id": sellerId,
-    }).select("*, user_profiles(*)");
+    final double roundedPrice = double.parse(price.toStringAsFixed(2));
 
-    return Item.fromMap((response as List).first);
+    try {
+      await supabase
+        .from("catalog")
+        .insert({
+          "id": itemID,
+          "item_name": name,
+          "price": roundedPrice,
+          "desc": desc,
+          "short_desc": shortDesc,
+          "stock": stock,
+          "is_public": isPublic,
+          "user_id": sellerId,
+        }); //.select("*, user_profiles(*)");
+    }
+    catch (e) {
+      // delete from bucket if failed so that there will be no orphaned image file
+      await supabase.storage.from("catalog-images").remove([imagePath]);
+
+      debugPrint("Error when creating listing: ${e.toString()}");
+
+      rethrow;
+    }
+
+    // return Item.fromMap((response as List).first);
+  }
+
+  static Future<void> updateListing({
+    required String itemID,
+    required String name,
+    required double price,
+    required String desc,
+    required String shortDesc,
+    required int stock,
+    required bool isPublic,
+    XFile? imageFile,
+  })
+  async {
+    final user = supabase.auth.currentUser;
+    if (user == null) throw Exception('Not signed in');
+
+    final sellerId = user.id;
+    final imagePath = '$sellerId/$itemID.jpg';
+
+    if (imageFile != null) {
+      await supabase.storage.from("catalog-images").update(
+        imagePath,
+        File(imageFile.path),
+        fileOptions: const FileOptions(contentType: 'image/jpeg'),
+      );
+    }
+
+    final double roundedPrice = double.parse(price.toStringAsFixed(2));
+
+    try {
+      await supabase
+        .from("catalog")
+        .update({
+          "item_name": name,
+          "price": roundedPrice,
+          "desc": desc,
+          "short_desc": shortDesc,
+          "stock": stock,
+          "is_public": isPublic,
+          "user_id": sellerId,
+        })
+        .eq("id", itemID);
+    }
+    catch (e) {
+      // delete from bucket if failed so that there will be no orphaned image file
+      await supabase.storage.from("catalog-images").remove([imagePath]);
+
+      debugPrint("Error when creating listing: ${e.toString()}");
+
+      rethrow;
+    }
+  }
+
+  static Future<void> deleteList({required String itemID}) async {
+    await supabase.from("catalog").delete().eq("id", itemID);
   }
 }

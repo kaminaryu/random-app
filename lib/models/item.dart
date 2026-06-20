@@ -14,7 +14,7 @@ class Item {
     required this.sellerName,
   });
 
-  final int    id;
+  final String id;
   final String name;
   final double price;
   final String desc;
@@ -40,7 +40,7 @@ class Item {
       rating:     row["rating"],
       amountSold: row["amount_sold"],
       createdAt:  DateTime.parse(row["item_created_at"]),
-      sellerID:   row["user_profiles"]?["user_id"],
+      sellerID:   row["user_id"],
       sellerName: row["user_profiles"]?["user_name"] ?? "Unknown Seller",
     );
   }
