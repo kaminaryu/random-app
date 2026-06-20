@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:i_bazaar/models/item.dart';
 import 'package:i_bazaar/services/catalog_handler.dart';
-import 'package:i_bazaar/widgets/listings/listing_card.dart';
+import 'package:i_bazaar/screens/main/listings/listing_card.dart';
 
 class ListingsScreen extends StatefulWidget {
   const ListingsScreen({super.key});

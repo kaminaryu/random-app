@@ -24,20 +24,49 @@ class ListingCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // ── Image ──
+              // ClipRRect(
+              //   borderRadius: BorderRadius.circular(12),
+              //   child: Image.network(
+              //     CatalogHandler.fetchImageUrl("${item.sellerID}/${item.name}.jpg"),
+              //     width: 120,
+              //     height: 120,
+              //     fit: BoxFit.contain,
+              //     loadingBuilder: (context, child, progress) {
+              //       if (progress == null) return child;
+              //       return const Center(child: CircularProgressIndicator());
+              //     },
+              //     errorBuilder: (context, error, stackTrace) {
+              //       return const Icon(Icons.broken_image);
+              //     }
+              //   ),
+              // ),
+              //
+
               ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: Image.network(
-                  CatalogHandler.fetchImageUrl("${item.sellerID}/${item.name}.jpg"),
+                borderRadius: BorderRadius.circular(16),
+                child: SizedBox(
                   width: 120,
                   height: 120,
-                  fit: BoxFit.contain,
-                  loadingBuilder: (context, child, progress) {
-                    if (progress == null) return child;
-                    return const Center(child: CircularProgressIndicator());
-                  },
-                  errorBuilder: (context, error, stackTrace) {
-                    return const Icon(Icons.broken_image);
-                  }
+
+                  child: Image.network(
+                    CatalogHandler.fetchImageUrl("${item.sellerID}/${item.name}.jpg"),
+                    width: 120,
+                    height: 120,
+                    fit: BoxFit.contain,
+
+                    loadingBuilder: (context, child, progress) {
+                      if (progress == null) return child;
+
+                      return const Center(child: CircularProgressIndicator());
+                    },
+
+                    errorBuilder: (context, error, stackTrace) {
+                      debugPrint("Error when fetching image: $error");
+                      debugPrint("Stack Trace: $stackTrace");
+
+                      return const Icon(Icons.broken_image);
+                    }
+                  ),
                 ),
               ),
               const SizedBox(width: 14),
@@ -87,27 +116,25 @@ class ListingCard extends StatelessWidget {
                           Text(
                             'RM${item.price}',
                             style: theme.textTheme.titleSmall?.copyWith(
-                              color: const Color(0xFF7F77DD),
+                              color: theme.colorScheme.onPrimary,
                               fontWeight: FontWeight.w700,
                             ),
                           ),
-                          // ── Pencil edit button ──
-                          InkWell(
-                            onTap: () {
-                              // TODO: future edit functionality
-                            },
-                            borderRadius: BorderRadius.circular(20),
-                            child: Container(
-                              padding: const EdgeInsets.all(6),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF7F77DD).withAlpha(40),
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: const Icon(
+
+                          Container(
+                            width: 32,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.black.withAlpha(67),
+                            ),
+
+                            child: IconButton(
+                              onPressed: () {},
+                              icon: Icon(
                                 Icons.edit,
-                                size: 18,
-                                color: Color(0xFFCECBF6),
-                              ),
+                                size: 14,
+                                color: theme.colorScheme.onPrimary,
+                              )
                             ),
                           ),
                         ],
@@ -160,19 +187,18 @@ class ListingCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
         decoration: BoxDecoration(
-          color: const Color(0xFF1A1740).withAlpha(200),
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
-            color: const Color(0xFF7F77DD).withAlpha(100),
-            width: 1,
+            color: theme.colorScheme.outline,
+            width: 2,
           ),
         ),
+
         child: Text(
           'Stock: ${item.stock}',
-          style: const TextStyle(
-            color: Color(0xFFCECBF6),
-            fontSize: 11,
-            fontWeight: FontWeight.w600,
+          style: TextStyle(
+            color: theme.colorScheme.onPrimary,
+            fontSize: 12,
           ),
         ),
       ),
