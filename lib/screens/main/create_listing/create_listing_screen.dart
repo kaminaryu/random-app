@@ -1,7 +1,6 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:i_bazaar/screens/main/create_listing/widgets/thumbnail_picker.dart';
 import 'package:i_bazaar/services/listing_handler.dart';
 import 'package:i_bazaar/widgets/auth/auth_text_field.dart';
 import 'package:i_bazaar/widgets/auth/snack_bar.dart';
@@ -75,7 +74,7 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
       AuthErrorSnackBar.show(
         ScaffoldMessenger.of(context),
         'Failed to create listing: $e',
-        Colors.red,
+        Theme.of(context).colorScheme.error,
       );
     } finally {
       if (mounted) setState(() => _isSubmitting = false);
@@ -109,45 +108,37 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
   }
 
   Widget _buildImagePicker(ThemeData theme) {
-    return GestureDetector(
-      onTap: _pickImage,
-      child: Container(
+    return Center(
+      child: SizedBox(
         height: 200,
-        decoration: BoxDecoration(
-          color: const Color(0xFF2D2A5E),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: const Color(0xFF7F77DD).withAlpha(80),
-            width: 2,
-          ),
-        ),
-        child: _imageFile != null
-            ? ClipRRect(
-                borderRadius: BorderRadius.circular(14),
-                child: Image.file(
-                  File(_imageFile!.path),
-                  width: double.infinity,
-                  height: 200,
-                  fit: BoxFit.cover,
+        width: 200,
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            GestureDetector(
+              onTap: _pickImage,
+              child: Container(
+                height: 200,
+                width: 200,
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.surfaceContainerHighest,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: theme.colorScheme.outline,
+                    width: 3,
+                  ),
                 ),
-              )
-            : Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.add_photo_alternate_outlined,
-                    size: 48,
-                    color: const Color(0xFF7F77DD),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Tap to add image',
-                    style: theme.textTheme.bodyLarge?.copyWith(
-                      color: const Color(0xFFCECBF6),
-                    ),
-                  ),
-                ],
+                child: (_imageFile == null)
+                  ? ThumbnailPicker.buildNoThumbnailPreview(theme)
+                  : ThumbnailPicker.buildThumbnailPreview(_imageFile!)
               ),
+            ),
+
+            (_imageFile == null)
+            ? SizedBox()
+            : ThumbnailPicker.buildDeleteButton(() => setState(() => _imageFile = null)),
+          ],
+        ),
       ),
     );
   }
@@ -155,10 +146,6 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
   Widget _buildFormCard(ThemeData theme) {
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: const Color(0xFF2D2A5E),
-        borderRadius: BorderRadius.circular(16),
-      ),
       child: Column(
         children: [
           AuthTextField(
@@ -169,26 +156,7 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
                 v == null || v.trim().isEmpty ? 'Required' : null,
           ),
           const SizedBox(height: 16),
-          AuthTextField(
-            controller: _shortDescController,
-            label: 'Short Description',
-            icon: Icons.short_text,
-            validator: (v) =>
-                v == null || v.trim().isEmpty ? 'Required' : null,
-          ),
-          const SizedBox(height: 16),
-          TextFormField(
-            controller: _descController,
-            maxLines: 3,
-            validator: (v) =>
-                v == null || v.trim().isEmpty ? 'Required' : null,
-            decoration: const InputDecoration(
-              labelText: 'Full Description',
-              prefixIcon: Icon(Icons.description_outlined),
-              border: OutlineInputBorder(),
-            ),
-          ),
-          const SizedBox(height: 16),
+
           AuthTextField(
             controller: _priceController,
             label: 'Price (RM)',
@@ -202,6 +170,7 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
             },
           ),
           const SizedBox(height: 16),
+
           AuthTextField(
             controller: _stockController,
             label: 'Stock',
@@ -215,12 +184,39 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
             },
           ),
           const SizedBox(height: 16),
+
+          AuthTextField(
+            controller: _shortDescController,
+            label: 'Short Description',
+            icon: Icons.short_text,
+            validator: (v) =>
+                v == null || v.trim().isEmpty ? 'Required' : null,
+          ),
+          const SizedBox(height: 16),
+
+          TextFormField(
+            controller: _descController,
+            maxLines: 3,
+            validator: (v) =>
+                v == null || v.trim().isEmpty ? 'Required' : null,
+            decoration: const InputDecoration(
+              labelText: 'Full Description',
+              prefixIcon: Icon(Icons.description_outlined),
+              border: OutlineInputBorder(),
+            ),
+          ),
+          const SizedBox(height: 16),
+
           SwitchListTile(
             contentPadding: EdgeInsets.zero,
-            title: const Text('Public'),
-            subtitle: const Text('Visible to everyone'),
+            title: (_isPublic)
+              ? const Text("Public")
+              : const Text("Private"),
+            subtitle: (_isPublic)
+              ? const Text("Visible to everyone")
+              : const Text("Only visible to you"),
             value: _isPublic,
-            activeTrackColor: const Color(0xFF7F77DD),
+            activeTrackColor: theme.colorScheme.primary,
             onChanged: (v) => setState(() => _isPublic = v),
           ),
         ],
@@ -232,22 +228,22 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
     return FilledButton(
       onPressed: _isSubmitting ? null : _onSubmit,
       style: FilledButton.styleFrom(
-        backgroundColor: const Color(0xFF7F77DD),
+        backgroundColor: theme.colorScheme.primary,
         padding: const EdgeInsets.symmetric(vertical: 16),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
         ),
       ),
-      child: _isSubmitting
-          ? const SizedBox(
-              height: 20,
-              width: 20,
-              child: CircularProgressIndicator(strokeWidth: 2),
-            )
-          : const Text(
-              'Create Listing',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-            ),
+      child: (_isSubmitting)
+        ? const SizedBox(
+            height: 20,
+            width: 20,
+            child: CircularProgressIndicator(strokeWidth: 2),
+          )
+        : const Text(
+            'Create Listing',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+          ),
     );
   }
 }

@@ -3,7 +3,7 @@ import 'package:i_bazaar/screens/auth/register_screen.dart';
 import 'package:i_bazaar/screens/main/adspace_screen.dart';
 import 'package:i_bazaar/screens/main/chat_detail_screen.dart';
 import 'package:i_bazaar/screens/main/chat_screen.dart';
-import 'package:i_bazaar/screens/main/create_listing_screen.dart';
+import 'package:i_bazaar/screens/main/create_listing/create_listing_screen.dart';
 import 'package:i_bazaar/screens/main/home_screen.dart';
 import 'package:i_bazaar/screens/auth/login_screen.dart';
 import 'package:i_bazaar/screens/main/listings_screen.dart';

@@ -30,7 +30,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           loggedIn = (snapshot.data?.session != null);
         }
 
-      // hide login button if user if loggedIN
+        // hide login button if user if loggedIN
         if (loggedIn) {
           return _buildSignedIn(context);
         }
@@ -57,6 +57,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               color: theme.colorScheme.onSurface.withAlpha(102),
             ),
             const SizedBox(height: 24),
+
             Text(
               'Not yet signed in',
               style: theme.textTheme.headlineSmall?.copyWith(
@@ -64,6 +65,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ),
             const SizedBox(height: 8),
+
             Text(
               'Sign in to access your profile and settings.',
               textAlign: TextAlign.center,
@@ -72,6 +74,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ),
             const SizedBox(height: 32),
+
             FilledButton.icon(
               onPressed: () async {
                 await context.push('/login');
@@ -100,12 +103,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
           children: [
             _buildHero(theme),
             const SizedBox(height: 28),
+
             ThemeCard(theme),
             const SizedBox(height: 12),
+
             _buildAdspaceCard(theme),
             const SizedBox(height: 12),
+
             _buildInfoCard(theme),
             const SizedBox(height: 12),
+
             _buildLogoutCard(theme),
           ],
         ),
@@ -126,6 +133,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ),
         const SizedBox(width: 16),
+
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -137,6 +145,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ),
               const SizedBox(height: 4),
+
               Text(
                 supabase.auth.currentUser?.email ?? "example@mail.com",
                 style: theme.textTheme.bodyMedium?.copyWith(
