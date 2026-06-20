@@ -185,6 +185,6 @@ Widget _socialButton(FaIconData icon, VoidCallback action) {
       shape: const CircleBorder(),
       padding: const EdgeInsets.all(16),
     ),
-    child: FaIcon(icon, size: 28),
+    child: FaIcon(icon, size: 22),
   );
 }
