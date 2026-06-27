@@ -25,6 +25,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final result = await CatalogHandler.fetchRangedItems(
       start: 0,
       end: 10,
+      sortingOption: SortingOptions.uploadDate,
     );
     setState(() {
       catalog = result;

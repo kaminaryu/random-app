@@ -11,7 +11,7 @@ import 'package:i_bazaar/screens/auth/login_screen.dart';
 import 'package:i_bazaar/screens/main/listings/listings_screen.dart';
 import 'package:i_bazaar/screens/main/main_screen.dart';
 import 'package:i_bazaar/screens/main/profile_screen.dart';
-import 'package:i_bazaar/screens/main/search_screen.dart';
+import 'package:i_bazaar/screens/main/search/search_screen.dart';
 
 final router = GoRouter(
   initialLocation: "/",

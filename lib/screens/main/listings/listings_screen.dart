@@ -52,6 +52,7 @@ class _ListingsScreenState extends State<ListingsScreen> {
         await CatalogHandler.fetchRangedItems(
           start: start,
           end: start + _pageSize - 1,
+          sortingOption: SortingOptions.uploadDate,
           userID: user.id,
         );
     if (!mounted) return;
