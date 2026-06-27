@@ -18,7 +18,14 @@ enum SortingOptions {
 class CatalogHandler {
   static final supabase = Supabase.instance.client;
 
-  static Future<List<Item>> fetchRangedItems({required int start, required int end, required SortingOptions sortingOption, String? userID}) async {
+  static Future<List<Item>> fetchRangedItems({
+    required int start,
+    required int end,
+    required SortingOptions sortingOption,
+    bool isAscending = false,
+    String? userID
+  })
+  async {
     final List<Map<String, dynamic>> response;
 
     if (userID != null) {
@@ -26,14 +33,14 @@ class CatalogHandler {
         .from("catalog")
         .select("*, user_profiles(*)")
         .eq("user_id", userID)
-        .order(sortingOption.queryColumn, ascending: false)
+        .order(sortingOption.queryColumn, ascending: isAscending)
         .range(start, end);
     }
     else {
       response = await supabase
         .from("catalog")
         .select("*, user_profiles(*)")
-        .order(sortingOption.queryColumn, ascending: false)
+        .order(sortingOption.queryColumn, ascending: isAscending)
         .range(start, end);
     }
 

@@ -1,7 +1,9 @@
 // NOTE: the menu bs is the most confusing code ive ever wrote..
 // but it works... i think
 import 'package:flutter/material.dart';
+import 'package:i_bazaar/models/item.dart';
 import 'package:i_bazaar/services/catalog_handler.dart';
+import 'package:i_bazaar/widgets/homepage/item_card.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
@@ -13,6 +15,7 @@ class SearchScreen extends StatefulWidget {
 class _SearchScreenState extends State<SearchScreen> {
   final _searchController = TextEditingController();
   SortingOptions _selectedSortingOption = SortingOptions.relevance;
+  bool _isAscending = false;
 
 
   Widget _buildSearchRow() {
@@ -117,6 +120,22 @@ class _SearchScreenState extends State<SearchScreen> {
               ),
             ]
           ),
+
+          SwitchListTile(
+            contentPadding: EdgeInsets.zero,
+            title: (_isAscending)
+              ? const Text("Ascending")
+              : const Text("Descending"),
+            subtitle: (_isAscending)
+              ? const Text("Lowest -> Highest")
+              : const Text("Highest -> Lowest"),
+            value: _isAscending,
+            activeTrackColor: Theme.of(context).colorScheme.primary,
+            onChanged: (v) {
+              setState(() => _isAscending = v);
+              setMenuState(() {});
+            },
+          ),
         ];
       }
     );
@@ -163,12 +182,10 @@ class _SearchScreenState extends State<SearchScreen> {
       child: OutlinedButton(
         onPressed: () {
           onPressed();
-          setMenuState(() {
-            _selectedSortingOption = sortingOption;
-          });
           setState(() {
             _selectedSortingOption = sortingOption;
           });
+          setMenuState(() {});
         },
         style: OutlinedButton.styleFrom(
           backgroundColor: isSelected ? colorScheme.primary : colorScheme.surface,
@@ -201,8 +218,20 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
 
-  Widget _buildCatalogGrid() {
-    return Text("hi");
+  Widget _buildCatalogGrid(List<Item> items) {
+    return GridView.builder(
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 16.0,
+        mainAxisSpacing: 8.0,
+        childAspectRatio: 9/16,
+      ),
+
+      itemCount: items.length,
+      itemBuilder: (itemContext, index) {
+        return ItemCard(items[index]);
+      },
+    );
   }
 
 
@@ -220,7 +249,22 @@ class _SearchScreenState extends State<SearchScreen> {
           _buildSearchButton(),
           SizedBox(height: 12),
 
-          _buildCatalogGrid(),
+          Expanded(child: FutureBuilder<List<Item>>(
+            future: CatalogHandler.fetchRangedItems(
+              start: 0,
+              end: 20,
+              sortingOption: _selectedSortingOption,
+              isAscending: _isAscending
+            ),
+            builder: (catalogContext, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) return Center(child: CircularProgressIndicator());
+    
+              if (!snapshot.hasData) return Text("Failed lol");
+
+              return _buildCatalogGrid(snapshot.data!);
+            }
+          ),
+          ),
           SizedBox(height: 12),
 
           Text(_selectedSortingOption.queryColumn),
