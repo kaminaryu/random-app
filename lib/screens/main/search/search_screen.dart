@@ -18,12 +18,15 @@ class _SearchScreenState extends State<SearchScreen> {
   final ValueNotifier<bool> _isFiltering = ValueNotifier<bool>(false);
   final ValueNotifier<bool> _isSorting   = ValueNotifier<bool>(false);
 
+  static const int _startSearch = 0;
+  static const int _endSearch   = 20;
+  static const double _minPriceRange = 0;
+  static const double _maxPriceRange = 1000;
+
   SortingOptions _selectedSortingOption = SortingOptions.relevance;
-  RangeValues _priceRange = RangeValues(0, 1000);
+  RangeValues _priceRange = RangeValues(_minPriceRange, _maxPriceRange);
   bool _isAscending = false;
 
-  int _startSearch = 0;
-  int _endSearch   = 20;
 
 
   @override
@@ -47,10 +50,22 @@ class _SearchScreenState extends State<SearchScreen> {
         ),
 
         // filter button
-        IconButton(
-          onPressed: () => _showFilterMenu(context),
-          tooltip: "Filter",
-          icon: Icon(Icons.tune),
+        ValueListenableBuilder(
+          valueListenable: _isFiltering,
+          builder: (context, isFiltering, child) {
+            return IconButton(
+              onPressed: () => _showFilterMenu(context),
+              tooltip: isFiltering ? 
+                "Filter (Active)"
+                : "Filter",
+              icon: isFiltering ?
+                Badge(
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  child: Icon(Icons.tune),
+                )
+                : Icon(Icons.tune),
+            );
+          }
         ),
 
         // sort button
@@ -59,7 +74,9 @@ class _SearchScreenState extends State<SearchScreen> {
           builder: (context, isSorting, child) {
             return IconButton(
               onPressed: () => _showSortMenu(context),
-              tooltip: "Sort",
+              tooltip: isSorting ?
+                "Sort (Active)"
+                : "Sort",
               icon: isSorting ?
                 Badge(
                   backgroundColor: Theme.of(context).colorScheme.primary,
@@ -90,16 +107,22 @@ class _SearchScreenState extends State<SearchScreen> {
 
           RangeSlider(
             values: _priceRange,
-            min: 0,
-            max: 1000,
+            min: _minPriceRange,
+            max: _maxPriceRange,
             divisions: 100,
             labels: RangeLabels(
               _priceRange.start.round().toString(),
-              _priceRange.end == 1000 ? 
+              _priceRange.end == _maxPriceRange ? 
               "${_priceRange.end.round()}+"
               : _priceRange.end.round().toString(),
             ),
-            onChanged: (RangeValues values) => setMenuState(() => _priceRange = values)
+            onChanged: (RangeValues values) => setMenuState(() {
+              _priceRange = values;
+              _isFiltering.value = (
+                _priceRange.start != _minPriceRange
+                || _priceRange.end != _maxPriceRange
+              );
+            })
           ),
 
           Row(
@@ -217,7 +240,7 @@ class _SearchScreenState extends State<SearchScreen> {
   })
   {
     final colorScheme = Theme.of(context).colorScheme;
-    final isSelected = sortingOption == _selectedSortingOption;
+    final isSelected = (sortingOption == _selectedSortingOption);
 
     return Expanded(
       child: OutlinedButton(
@@ -313,7 +336,7 @@ class _SearchScreenState extends State<SearchScreen> {
           _buildCatalog(),
           SizedBox(height: 12),
 
-          Text(_selectedSortingOption.queryColumn),
+          // Text(_selectedSortingOption.queryColumn),
         ],
       )
     );
