@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:i_bazaar/models/item.dart';
 import 'package:i_bazaar/screens/main/item/widgets/add_to_cart_button.dart';
+import 'package:i_bazaar/screens/main/item/widgets/add_to_cart_dialog.dart';
 import 'package:i_bazaar/screens/main/item/widgets/item_details.dart';
 import 'package:i_bazaar/screens/main/item/widgets/item_metadata_label.dart';
 import 'package:i_bazaar/screens/main/item/widgets/item_thumbnail.dart';
+import 'package:i_bazaar/services/cart_handler.dart';
 import 'package:i_bazaar/services/catalog_handler.dart';
 import 'package:i_bazaar/widgets/main/main_app_bar.dart';
 
@@ -22,6 +24,9 @@ class ItemScreen extends StatelessWidget {
           ItemMetadataLabel(item: item, theme: theme),
 
           ItemDetails(item: item, theme: theme),
+
+          // because of FAB
+          SizedBox(height: 64),
         ],
       ),
     );
@@ -54,7 +59,15 @@ class ItemScreen extends StatelessWidget {
 
           floatingActionButton: AddToCartButton(
             price: item.price,
-            onPressed: () {},
+            onPressed: () => showDialog(
+              context: context,
+              builder: (dialogContext) => AddToCartDialog(
+                item: item,
+                onConfirm: (amount) {
+                  CartHandler.addToCart(item, amount);
+                }
+              )
+            ),
           ),
           floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
         );

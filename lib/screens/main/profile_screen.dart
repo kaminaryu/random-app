@@ -137,7 +137,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             leading: const Icon(Icons.privacy_tip_outlined),
             title: const Text('Privacy Policy'),
             trailing: const Icon(Icons.chevron_right),
-            onTap: () => {},
+            onTap: () => context.push("/cart"),
           ),
           const Divider(height: 1, indent: 56),
 

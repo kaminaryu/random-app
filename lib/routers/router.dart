@@ -2,6 +2,7 @@ import 'package:go_router/go_router.dart';
 import 'package:i_bazaar/models/item.dart';
 import 'package:i_bazaar/screens/auth/register_screen.dart';
 import 'package:i_bazaar/screens/main/adspace_screen.dart';
+import 'package:i_bazaar/screens/main/cart/cart_screem.dart';
 import 'package:i_bazaar/screens/main/chat_screen.dart';
 import 'package:i_bazaar/screens/main/create_listing/create_listing_screen.dart';
 import 'package:i_bazaar/screens/main/edit_listing/edit_listing_screen.dart';
@@ -20,6 +21,9 @@ final router = GoRouter(
     GoRoute(path: "/register", builder: (context, state) => RegisterScreen()),
     GoRoute(path: "/adspace", builder: (context, state) => const AdspaceScreen()),
     GoRoute(path: "/create-listing", builder: (context, state) => const CreateListingScreen()),
+    GoRoute(path: "/cart", builder: (context, state) => const CartScreen()),
+
+
     GoRoute(path: "/edit-listing", builder: (context, state) {
       final item = state.extra as Item;
       return EditListingScreen(item);
