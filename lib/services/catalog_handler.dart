@@ -3,15 +3,14 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 
 enum SortingOptions {
-  relevance("", "Relevance"),
-  uploadDate("item_created_at", ""),
-  price("price", ""),
-  rating("rating", "");
+  relevance("relevance"),
+  uploadDate("item_created_at"),
+  price("price"),
+  rating("rating");
 
   // so that the enums have values lol, just contructor
-  const SortingOptions(this.queryColumn, this.label);
+  const SortingOptions(this.queryColumn);
   final String queryColumn;
-  final String label;
 }
 
 
@@ -51,6 +50,30 @@ class CatalogHandler {
 
   static String fetchImageUrl(String path) {
     return supabase.storage.from("catalog-images").getPublicUrl(path);
+  }
+
+  static Future<List<Item>> searchRangedItems({
+    required int start,
+    required int end,
+    required String query,
+    required SortingOptions sortingOption,
+    bool isAscending = false,
+  })
+  async {
+    final List<Map<String, dynamic>> response = await supabase.rpc(
+      "search_catalogs",
+      params: {
+        'search_query': query,
+        'sorting_option': sortingOption.queryColumn,
+        'ascending': isAscending,
+        'page_offset': start,
+        'page_limit': end - start + 1,
+      }
+    );
+
+    return (response as List)
+      .map((row) => Item.fromMap(row))
+      .toList();
   }
 
   // static String fetchRelevanceSortedRangedItems() {

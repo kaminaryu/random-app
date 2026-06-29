@@ -16,7 +16,14 @@ class _SearchScreenState extends State<SearchScreen> {
   final _searchController = TextEditingController();
   SortingOptions _selectedSortingOption = SortingOptions.relevance;
   bool _isAscending = false;
+  int _startSearch = 0;
+  int _endSearch = 20;
 
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   Widget _buildSearchRow() {
     return Row(
@@ -195,7 +202,9 @@ class _SearchScreenState extends State<SearchScreen> {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
-        onPressed: () => setState(() {}), // rebuilds the screen
+        onPressed: () => setState(
+          () {}
+        ),
         style: ElevatedButton.styleFrom(
           backgroundColor: colorScheme.primary,
           foregroundColor: colorScheme.onPrimary,
@@ -240,16 +249,19 @@ class _SearchScreenState extends State<SearchScreen> {
           SizedBox(height: 12),
 
           Expanded(child: FutureBuilder<List<Item>>(
-            future: CatalogHandler.fetchRangedItems(
-              start: 0,
-              end: 20,
+            future: CatalogHandler.searchRangedItems(
+              start: _startSearch,
+              end: _endSearch,
+              query: _searchController.text,
               sortingOption: _selectedSortingOption,
               isAscending: _isAscending
             ),
             builder: (catalogContext, snapshot) {
+              if (_searchController.text.isEmpty) return Center(child: Text("You have not search anything yet."));
+
               if (snapshot.connectionState == ConnectionState.waiting) return Center(child: CircularProgressIndicator());
-    
-              if (!snapshot.hasData) return Text("Failed lol");
+ 
+              if (!snapshot.hasData) return Text(snapshot.error.toString());
 
               return _buildCatalogGrid(snapshot.data!);
             }
