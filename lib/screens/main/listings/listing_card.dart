@@ -21,129 +21,132 @@ class ListingCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Stack(
-      clipBehavior: Clip.none,
-      children: [
-        Container(
-          decoration: BoxDecoration(
-            color: theme.colorScheme.primary,
-            borderRadius: BorderRadius.circular(16),
-          ),
-          padding: const EdgeInsets.all(12),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(16),
-                child: SizedBox(
-                  width: 120,
-                  height: 120,
-
-                  child: Image.network(
-                    CatalogHandler.fetchImageUrl("${item.sellerID}/${item.id}.jpg"),
+    return GestureDetector(
+      onTap: () => context.push("/item/?id=${item.id}"),
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              color: theme.colorScheme.primary,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            padding: const EdgeInsets.all(12),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: SizedBox(
                     width: 120,
                     height: 120,
-                    fit: BoxFit.contain,
 
-                    loadingBuilder: (context, child, progress) {
-                      if (progress == null) return child;
+                    child: Image.network(
+                      CatalogHandler.fetchImageUrl(item.sellerID, item.id),
+                      width: 120,
+                      height: 120,
+                      fit: BoxFit.contain,
 
-                      return const Center(child: CircularProgressIndicator());
-                    },
+                      loadingBuilder: (context, child, progress) {
+                        if (progress == null) return child;
 
-                    errorBuilder: (context, error, stackTrace) {
-                      debugPrint("Error when fetching image: $error");
-                      debugPrint("Stack Trace: $stackTrace");
+                        return const Center(child: CircularProgressIndicator());
+                      },
 
-                      return const Icon(Icons.broken_image);
-                    }
+                      errorBuilder: (context, error, stackTrace) {
+                        debugPrint("Error when fetching image: $error");
+                        debugPrint("Stack Trace: $stackTrace");
+
+                        return const Icon(Icons.broken_image);
+                      }
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(width: 14),
+                const SizedBox(width: 14),
 
-              // ── Info column ──
-              Expanded(
-                child: SizedBox(
-                  height: 120,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            item.name,
-                            style: theme.textTheme.titleSmall?.copyWith(
-                              color: Colors.white,
+                // ── Info column ──
+                Expanded(
+                  child: SizedBox(
+                    height: 120,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              item.name,
+                              style: theme.textTheme.titleSmall?.copyWith(
+                                color: Colors.white,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          const SizedBox(height: 2),
+                            const SizedBox(height: 2),
 
-                          Text(
-                            '@${item.sellerName}',
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: const Color(0xFFCECBF6),
+                            Text(
+                              '@${item.sellerName}',
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: const Color(0xFFCECBF6),
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: 4),
+                            const SizedBox(height: 4),
 
-                          Text(
-                            item.desc,
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: Colors.white70,
+                            Text(
+                              item.desc,
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: Colors.white70,
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
                             ),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ],
-                      ),
+                          ],
+                        ),
 
-                      // ── Price + edit button row ──
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'RM${item.price}',
-                            style: theme.textTheme.titleSmall?.copyWith(
-                              color: theme.colorScheme.onPrimary,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-
-                          Container(
-                            width: 32,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Colors.black.withAlpha(67),
-                            ),
-
-                            child: IconButton(
-                              onPressed: () => _goToEditScreen(context),
-                              icon: Icon(
-                                Icons.edit,
-                                size: 14,
+                        // ── Price + edit button row ──
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'RM${item.price}',
+                              style: theme.textTheme.titleSmall?.copyWith(
                                 color: theme.colorScheme.onPrimary,
-                              )
+                                fontWeight: FontWeight.w700,
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                    ],
+
+                            Container(
+                              width: 32,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.black.withAlpha(67),
+                              ),
+
+                              child: IconButton(
+                                onPressed: () => _goToEditScreen(context),
+                                icon: Icon(
+                                  Icons.edit,
+                                  size: 14,
+                                  color: theme.colorScheme.onPrimary,
+                                )
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
 
 
-        _buildStatusLabel(theme),
-        _buildStockCounter(theme),
-      ],
+          _buildStatusLabel(theme),
+          _buildStockCounter(theme),
+        ],
+      ),
     );
   }
 

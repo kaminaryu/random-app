@@ -6,7 +6,9 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 // PreferredSizeWidget is an interface that have fixed height
 // Must have for AppBar() and shi
 class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
-  const MainAppBar({super.key});
+  const MainAppBar({super.key, this.label});
+
+  final String? label;
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +19,7 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
       title: TextButton(
         onPressed: () => context.go("/"),
         child: Text(
-          "i-Bazaar",
+          label ?? "i-Bazaar",
           style: TextStyle(
             color: Colors.white,
             fontSize: 20,

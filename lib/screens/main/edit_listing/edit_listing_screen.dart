@@ -223,7 +223,7 @@ class _EditListingScreenState extends State<EditListingScreen> {
     }
 
     return Image.network(
-      CatalogHandler.fetchImageUrl("${widget.item.sellerID}/${widget.item.id}.jpg"),
+      CatalogHandler.fetchImageUrl(widget.item.sellerID, widget.item.id),
       width: 120,
       height: 120,
       fit: BoxFit.contain,

@@ -28,7 +28,7 @@ class Item {
   final String sellerName;
 
 
-  factory Item.fromMap(Map<String, dynamic> row) {
+  factory Item.fromMapToItem(Map<String, dynamic> row) {
     return Item(
       id:         row["id"],
       name:       row["item_name"],
@@ -41,7 +41,7 @@ class Item {
       amountSold: row["amount_sold"],
       createdAt:  DateTime.parse(row["item_created_at"]),
       sellerID:   row["user_id"],
-      sellerName: row["user_profiles"]?["user_name"] ?? "Unknown Seller",
+      sellerName: row["user_profiles"]?["user_name"] ?? row["user_name"] ?? "Unknown User",
     );
   }
 }

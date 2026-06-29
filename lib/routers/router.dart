@@ -2,12 +2,12 @@ import 'package:go_router/go_router.dart';
 import 'package:i_bazaar/models/item.dart';
 import 'package:i_bazaar/screens/auth/register_screen.dart';
 import 'package:i_bazaar/screens/main/adspace_screen.dart';
-import 'package:i_bazaar/screens/main/chat_detail_screen.dart';
 import 'package:i_bazaar/screens/main/chat_screen.dart';
 import 'package:i_bazaar/screens/main/create_listing/create_listing_screen.dart';
 import 'package:i_bazaar/screens/main/edit_listing/edit_listing_screen.dart';
 import 'package:i_bazaar/screens/main/home_screen.dart';
 import 'package:i_bazaar/screens/auth/login_screen.dart';
+import 'package:i_bazaar/screens/main/item/item_screen.dart';
 import 'package:i_bazaar/screens/main/listings/listings_screen.dart';
 import 'package:i_bazaar/screens/main/main_screen.dart';
 import 'package:i_bazaar/screens/main/profile_screen.dart';
@@ -26,10 +26,11 @@ final router = GoRouter(
     }),
 
     GoRoute(
-      path: "/chat/:conversationId",
-      builder: (context, state) => ChatDetailScreen(
-        conversationId: state.pathParameters['conversationId']!,
-      ),
+      path: "/item",
+      builder: (context, state) {
+        final id = state.uri.queryParameters["id"]!;
+        return ItemScreen(itemID: id);
+      }
     ),
 
     ShellRoute(

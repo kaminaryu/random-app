@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:i_bazaar/models/item.dart';
 import 'package:i_bazaar/services/catalog_handler.dart';
 import 'package:i_bazaar/widgets/homepage/hero.dart';
 import 'package:i_bazaar/widgets/homepage/item_card.dart';
@@ -14,6 +15,9 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   List catalog = [];
   bool isLoading = true;
+
+  int _startSearch = 0;
+  int _endSearch   = 20;
 
   @override
   void initState() {
@@ -33,49 +37,57 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  Widget _buildCatalog() {
+    return 
+       FutureBuilder<List<Item>>(
+        future: CatalogHandler.fetchRangedItems(
+          start: _startSearch,
+          end: _endSearch,
+          sortingOption: SortingOptions.uploadDate,
+        ),
+        builder: (catalogContext, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) return Center(child: CircularProgressIndicator());
+
+          if (!snapshot.hasData || snapshot.data!.isEmpty) return SizedBox(child: Text("Error Displaying Catalog."));
+
+          return _buildCatalogGrid(snapshot.data!);
+        }
+    );
+  }
+
+  Widget _buildCatalogGrid(List<Item> items) {
+    return GridView.builder(
+      shrinkWrap: true, // wraps children
+      physics: const NeverScrollableScrollPhysics(), // do not scroll itself
+      padding: EdgeInsets.symmetric(horizontal: 24.0),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 16.0,
+        mainAxisSpacing: 8.0,
+        childAspectRatio: 9/16,
+      ),
+
+      itemCount: items.length,
+      itemBuilder: (itemContext, index) {
+        return ItemCard(items[index]);
+      },
+    );
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          SliverToBoxAdapter(child: HomeHero()),
-          SliverToBoxAdapter(child: SectionTitle("Catalogs")),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            HomeHero(),
+            SectionTitle("Catalogs"),
+            SizedBox(height: 16),
 
-          if (isLoading)
-            SliverFillRemaining(child: Center(child: CircularProgressIndicator()))
-          else
-            SliverLayoutBuilder(builder: (context, constraints) {
-              const columnsCount = 2;
-              const crossAxisPadding = 24.0;
-              const gapBetweenImageAndText = 8.0;
-              const crossAxisSpacing = 12.0;
-              const mainAxisSpacing = 24.0;
-              const textBlockBaseHeight = 80.0;
-
-              final widgetWidth = constraints.crossAxisExtent;
-              final cardWidth = (widgetWidth - crossAxisPadding * 2 - crossAxisSpacing) / columnsCount;
-              final textBlockHeight = textBlockBaseHeight * MediaQuery.textScalerOf(context).scale(1.0);
-
-              final cardHeight = cardWidth + gapBetweenImageAndText + textBlockHeight;
-
-
-              return SliverPadding(
-                padding: EdgeInsets.symmetric(horizontal: crossAxisPadding, vertical: mainAxisSpacing),
-                sliver: SliverGrid(
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: columnsCount,
-                    crossAxisSpacing: crossAxisSpacing,
-                    mainAxisSpacing: mainAxisSpacing,
-                    mainAxisExtent: cardHeight,
-                  ),
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) => ItemCard(catalog[index]),
-                    childCount: catalog.length,
-                  ),
-                ),
-              );
-            }),
-        ],
+            _buildCatalog()
+          ],
+        ),
       ),
     );
   }
