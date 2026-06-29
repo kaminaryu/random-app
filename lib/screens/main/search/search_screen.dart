@@ -14,10 +14,17 @@ class SearchScreen extends StatefulWidget {
 
 class _SearchScreenState extends State<SearchScreen> {
   final _searchController = TextEditingController();
+
+  final ValueNotifier<bool> _isFiltering = ValueNotifier<bool>(false);
+  final ValueNotifier<bool> _isSorting   = ValueNotifier<bool>(false);
+
   SortingOptions _selectedSortingOption = SortingOptions.relevance;
+  RangeValues _priceRange = RangeValues(0, 1000);
   bool _isAscending = false;
+
   int _startSearch = 0;
-  int _endSearch = 20;
+  int _endSearch   = 20;
+
 
   @override
   void dispose() {
@@ -42,18 +49,29 @@ class _SearchScreenState extends State<SearchScreen> {
         // filter button
         IconButton(
           onPressed: () => _showFilterMenu(context),
+          tooltip: "Filter",
           icon: Icon(Icons.tune),
         ),
 
         // sort button
-        IconButton(
-          onPressed: () => _showSortMenu(context),
-          icon: Icon(Icons.sort),
+        ValueListenableBuilder(
+          valueListenable: _isSorting,
+          builder: (context, isSorting, child) {
+            return IconButton(
+              onPressed: () => _showSortMenu(context),
+              tooltip: "Sort",
+              icon: isSorting ?
+                Badge(
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  child: Icon(Icons.sort),
+                )
+                : Icon(Icons.sort),
+            );
+          }
         )
       ]
     );
   }
-
 
 
   void _showFilterMenu(BuildContext context) {
@@ -69,6 +87,28 @@ class _SearchScreenState extends State<SearchScreen> {
             ),
           ),
           Row(),
+
+          RangeSlider(
+            values: _priceRange,
+            min: 0,
+            max: 1000,
+            divisions: 100,
+            labels: RangeLabels(
+              _priceRange.start.round().toString(),
+              _priceRange.end == 1000 ? 
+              "${_priceRange.end.round()}+"
+              : _priceRange.end.round().toString(),
+            ),
+            onChanged: (RangeValues values) => setMenuState(() => _priceRange = values)
+          ),
+
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: const [
+              Text('Min'),
+              Text('Max'),
+            ],
+          )
         ];
       }
     );
@@ -183,12 +223,12 @@ class _SearchScreenState extends State<SearchScreen> {
       child: OutlinedButton(
         onPressed: () {
           setMenuState(() => _selectedSortingOption = sortingOption);
+          _isSorting.value = (_selectedSortingOption != SortingOptions.relevance);
         },
         style: OutlinedButton.styleFrom(
           backgroundColor: isSelected ? colorScheme.primary : colorScheme.surface,
           foregroundColor: isSelected ? colorScheme.surface : colorScheme.primary,
         ),
-
 
         child: Text(label),
       )
@@ -202,9 +242,7 @@ class _SearchScreenState extends State<SearchScreen> {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
-        onPressed: () => setState(
-          () {}
-        ),
+        onPressed: () => setState(() {}),
         style: ElevatedButton.styleFrom(
           backgroundColor: colorScheme.primary,
           foregroundColor: colorScheme.onPrimary,
@@ -216,6 +254,30 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 
+  Widget _buildCatalog() {
+    return Expanded(
+      child: FutureBuilder<List<Item>>(
+        future: CatalogHandler.searchRangedItems(
+          start: _startSearch,
+          end: _endSearch,
+          query: _searchController.text,
+          priceStart: _priceRange.start,
+          priceEnd: _priceRange.end,
+          sortingOption: _selectedSortingOption,
+          isAscending: _isAscending
+        ),
+        builder: (catalogContext, snapshot) {
+          if (_searchController.text.isEmpty) return Center(child: Text("You have not search anything yet."));
+
+          if (snapshot.connectionState == ConnectionState.waiting) return Center(child: CircularProgressIndicator());
+
+          if (!snapshot.hasData || snapshot.data!.isEmpty) return SizedBox(child: Text("No result found."));
+
+          return _buildCatalogGrid(snapshot.data!);
+        }
+      ),
+    );
+  }
 
   Widget _buildCatalogGrid(List<Item> items) {
     return GridView.builder(
@@ -248,25 +310,7 @@ class _SearchScreenState extends State<SearchScreen> {
           _buildSearchButton(),
           SizedBox(height: 12),
 
-          Expanded(child: FutureBuilder<List<Item>>(
-            future: CatalogHandler.searchRangedItems(
-              start: _startSearch,
-              end: _endSearch,
-              query: _searchController.text,
-              sortingOption: _selectedSortingOption,
-              isAscending: _isAscending
-            ),
-            builder: (catalogContext, snapshot) {
-              if (_searchController.text.isEmpty) return Center(child: Text("You have not search anything yet."));
-
-              if (snapshot.connectionState == ConnectionState.waiting) return Center(child: CircularProgressIndicator());
- 
-              if (!snapshot.hasData) return Text(snapshot.error.toString());
-
-              return _buildCatalogGrid(snapshot.data!);
-            }
-          ),
-          ),
+          _buildCatalog(),
           SizedBox(height: 12),
 
           Text(_selectedSortingOption.queryColumn),

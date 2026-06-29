@@ -57,15 +57,21 @@ class CatalogHandler {
     required int end,
     required String query,
     required SortingOptions sortingOption,
+    required double priceStart,
+    required double priceEnd,
     bool isAscending = false,
   })
   async {
+    if (priceEnd == 1000) priceEnd = 999999;
+
     final List<Map<String, dynamic>> response = await supabase.rpc(
       "search_catalogs",
       params: {
         'search_query': query,
         'sorting_option': sortingOption.queryColumn,
         'ascending': isAscending,
+        'price_start': priceStart,
+        'price_end': priceEnd,
         'page_offset': start,
         'page_limit': end - start + 1,
       }
