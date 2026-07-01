@@ -2,7 +2,7 @@ import 'package:go_router/go_router.dart';
 import 'package:i_bazaar/models/item.dart';
 import 'package:i_bazaar/screens/auth/register_screen.dart';
 import 'package:i_bazaar/screens/main/adspace_screen.dart';
-import 'package:i_bazaar/screens/main/cart/cart_screem.dart';
+import 'package:i_bazaar/screens/main/cart/cart_screen.dart';
 import 'package:i_bazaar/screens/main/chat_screen.dart';
 import 'package:i_bazaar/screens/main/create_listing/create_listing_screen.dart';
 import 'package:i_bazaar/screens/main/edit_listing/edit_listing_screen.dart';

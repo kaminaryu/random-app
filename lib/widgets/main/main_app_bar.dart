@@ -13,7 +13,7 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      backgroundColor: Color(0xFF5A189A),
+      backgroundColor: Theme.of(context).colorScheme.primary,
  
       // center
       title: TextButton(
@@ -45,10 +45,19 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
               loggedIn = (snapshot.data?.session != null);
             }
 
-          // hide login button if user if loggedIN
+            // change to cart icon when logged out
             if (loggedIn) {
-              return SizedBox.shrink();
+              return Padding(
+                padding: EdgeInsets.only(right: 16.0),
+                  child: IconButton(
+                  onPressed: () => context.push("/cart"),
+                  icon: Icon(Icons.shopping_cart),
+                  tooltip: "Cart",
+                  color: Theme.of(context).colorScheme.onPrimary,
+                )
+              );
             }
+
             return ElevatedButton(
               onPressed: () => context.push("/login"),
 

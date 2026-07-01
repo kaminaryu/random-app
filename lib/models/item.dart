@@ -47,6 +47,25 @@ class Item {
     );
   }
 
+  factory Item.fromCartRow(Map<String, dynamic> cartRow) {
+    final catalog = cartRow["catalog"] as Map<String, dynamic>;
+    return Item(
+      id:         catalog["id"],
+      name:       catalog["item_name"],
+      price:      catalog["price"],
+      desc:       catalog["desc"],
+      shortDesc:  catalog["short_desc"],
+      stock:      catalog["stock"],
+      amountInCart: cartRow["item_quantity"] as int,
+      isPublic:   catalog["is_public"],
+      rating:     catalog["rating"],
+      amountSold: catalog["amount_sold"],
+      createdAt:  DateTime.parse(catalog["item_created_at"]),
+      sellerID:   catalog["user_id"],
+      sellerName: catalog["user_profiles"]?["user_name"] ?? "Unknown User",
+    );
+  }
+
   Map<String, dynamic> fromItemToMap() {
     return {
       "id": id,

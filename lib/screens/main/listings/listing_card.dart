@@ -125,6 +125,7 @@ class ListingCard extends StatelessWidget {
 
                               child: IconButton(
                                 onPressed: () => _goToEditScreen(context),
+                                tooltip: "Edit Listing",
                                 icon: Icon(
                                   Icons.edit,
                                   size: 14,

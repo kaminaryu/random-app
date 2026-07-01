@@ -16,7 +16,8 @@ enum SortingOptions {
 
 class CatalogHandler {
   static final supabase = Supabase.instance.client;
-  static final Map<String, Item> _items = {};
+  // caching feature, unused rn cuz headache
+  // static final Map<String, Item> _items = {};
 
   static Future<List<Item>> fetchRangedItems({
     required int start,
@@ -87,7 +88,7 @@ class CatalogHandler {
 
   static Future<Item> fetchItem(String itemID) async {
     // do not call db if item is already cached
-    if (_items.containsKey(itemID)) return _items[itemID]!;
+    // if (_items.containsKey(itemID)) return _items[itemID]!;
 
     final List<Map<String, dynamic>> response = await supabase
       .from("catalog")
@@ -104,8 +105,12 @@ class CatalogHandler {
     final item = Item.fromMapToItem(row);
 
     // cache the item
-    _items[itemID] = item;
+    // _items[itemID] = item;
  
     return item;
   }
+
+  // static void clearCache() {
+  //   _items.clear();
+  // }
 }

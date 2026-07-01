@@ -16,8 +16,8 @@ class _HomeScreenState extends State<HomeScreen> {
   List catalog = [];
   bool isLoading = true;
 
-  int _startSearch = 0;
-  int _endSearch   = 20;
+  final int _startSearch = 0;
+  final int _endSearch   = 20;
 
   @override
   void initState() {
@@ -27,8 +27,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> fetchCatalog() async {
     final result = await CatalogHandler.fetchRangedItems(
-      start: 0,
-      end: 10,
+      start: _startSearch,
+      end: _endSearch,
       sortingOption: SortingOptions.uploadDate,
     );
     setState(() {

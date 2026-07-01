@@ -110,7 +110,32 @@ class ListingHandler {
     }
   }
 
-  static Future<void> deleteList({required String itemID}) async {
+
+  // using RPC to avoid race cond
+  static Future<void> decreaseListingStock({
+    required String itemID,
+    required int amount
+  })
+  async {
+    try {
+      await supabase
+        .rpc("decrease_stock", params: {
+          "item_id": itemID,
+          "amount": amount
+        });
+    }
+    catch (e) {
+      debugPrint("Error when creating listing: ${e.toString()}");
+      rethrow;
+    }
+  }
+
+
+  static Future<void> deleteList({required String sellerID, required String itemID}) async {
     await supabase.from("catalog").delete().eq("id", itemID);
+
+    // delete the thumbnail associated with the item
+    final imagePath = '$sellerID/$itemID.jpg';
+    await supabase.storage.from("catalog-images").remove([imagePath]);
   }
 }

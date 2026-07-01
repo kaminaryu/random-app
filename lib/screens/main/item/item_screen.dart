@@ -64,7 +64,7 @@ class ItemScreen extends StatelessWidget {
               builder: (dialogContext) => AddToCartDialog(
                 item: item,
                 onConfirm: (amount) {
-                  CartHandler.addToCart(item, amount);
+                  CartHandler.addItemToCart(itemID: item.id, quantity: amount);
                 }
               )
             ),

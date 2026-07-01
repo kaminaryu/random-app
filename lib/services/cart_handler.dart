@@ -1,64 +1,148 @@
-import 'dart:convert';
-
-import 'package:flutter/cupertino.dart';
-import 'package:i_bazaar/models/cart_item.dart';
+import 'package:flutter/rendering.dart';
 import 'package:i_bazaar/models/item.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:i_bazaar/services/listing_handler.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class CartHandler {
-  static const _cartKey = 'cart_items';
+  static final supabase = Supabase.instance.client;
 
-  static Future<void> saveCart(List<CartItem> cartItems) async {
-    final prefs = await SharedPreferences.getInstance();
-    final jsonList = cartItems.map((c) => jsonEncode(c.toMap())).toList();
-    await prefs.setStringList(_cartKey, jsonList);
-  }
 
-  static Future<List<CartItem>> loadCart() async {
-    final prefs = await SharedPreferences.getInstance();
-    final jsonList = prefs.getStringList(_cartKey) ?? [];
-    return jsonList.map((jsonStr) => CartItem.fromMap(jsonDecode(jsonStr))).toList();
-  }
+  static Future<void> addItemToCart({
+    required String itemID,
+    required int quantity
+  })
+  async {
+    final user = supabase.auth.currentUser;
 
-  static Future<void> addToCart(Item item, int amount) async {
-    final cart = await loadCart();
-    final index = cart.indexWhere((c) => c.item.id == item.id);
-
-    if (index == -1) {
-      cart.add(CartItem(item: item, quantity: amount));
-    }
-    else {
-      cart[index] = cart[index].copyWith(quantity: cart[index].quantity + amount);
+    if (user == null) {
+      debugPrint("User is not logged in");
+      return;
     }
 
-    await saveCart(cart);
-  }
+    // basically check if user add more amount when they already have the shit in the cart yk, ik you have done this before
+    try {
+      final int existingCartItemQuantity = await _checkForExistingCartItem(itemID: itemID);
 
-  static Future<void> removeFromCart(String itemId) async {
-    final cart = await loadCart();
-    cart.removeWhere((c) => c.item.id == itemId);
-    await saveCart(cart);
-  }
+      if (existingCartItemQuantity == -1) {
+        _createNewCartItem(user: user, itemID: itemID, quantity: quantity);
+      }
+      else {
+        _changeCartItemQuantity(itemID: itemID, currentQuantity: existingCartItemQuantity, deltaQuantity: quantity);
+      }
 
-  static Future<void> updateQuantity(String itemId, int newQuantity) async {
-    final cart = await loadCart();
-    final index = cart.indexWhere((c) => c.item.id == itemId);
-    if (index != -1) {
-      cart[index] = cart[index].copyWith(quantity: newQuantity);
+      ListingHandler.decreaseListingStock(itemID: itemID, amount: quantity);
+
     }
-    await saveCart(cart);
-  }
-
-  static Future<void> clearCart() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove(_cartKey);
-  }
-
-  static Future<void> debugPrintCartItems() async {
-    final cart = await CartHandler.loadCart();
-    debugPrint('--- CART (${cart.length} items) ---');
-    for (final c in cart) {
-      debugPrint('${c.item.name} x${c.quantity}');
+    catch (e) {
+      debugPrint("Error when adding to cart: ${e.toString()}");
+      rethrow;
     }
   }
+
+
+  static Future<int> _checkForExistingCartItem({required String itemID}) async {
+    final user = supabase.auth.currentUser;
+    if (user == null) return -1;
+
+    final  List<Map<String, dynamic>> response;
+
+    try {
+      response = await supabase
+        .from("user_cart")
+        .select("item_quantity")
+        .eq("item_id", itemID)
+        .eq("user_id", user.id);
+    }
+    catch (e) {
+      debugPrint("Error when fetching existing item quantity: ${e.toString()}");
+      rethrow;
+    }
+
+    if (response.isEmpty) {
+      return -1;
+    }
+    
+    return response.first["item_quantity"];
+  }
+
+
+  static Future<void> _changeCartItemQuantity({
+    required String itemID,
+    required int currentQuantity,
+    required int deltaQuantity,
+  }) async {
+    int newQuantity = currentQuantity + deltaQuantity;
+
+    try {
+      await supabase
+        .from("user_cart")
+        .update({
+          "item_quantity": newQuantity,
+        })
+        .eq("item_id", itemID);
+    }
+    catch (e) {
+      debugPrint("Error when changing cart item quantity: ${e.toString()}");
+      rethrow;
+    }
+  }
+
+
+  static Future<void> _createNewCartItem({
+    required User user,
+    required String itemID,
+    required int quantity,
+  }) async {
+    try {
+      await supabase
+        .from("user_cart")
+        .insert({
+          "user_id": user.id,
+          "item_id": itemID,
+          "item_quantity": quantity,
+        });
+    }
+    catch (e) {
+      debugPrint("Error when creating new cart item listing: ${e.toString()}");
+      rethrow;
+    }
+  }
+
+
+  static Future<void> removeItemFromCart({required String itemID}) async {
+    final user = supabase.auth.currentUser;
+    if (user == null) return;
+
+    try {
+      await supabase
+        .from("user_cart")
+        .delete()
+        .eq("item_id", itemID)
+        .eq("user_id", user.id);
+    }
+    catch (e) {
+      debugPrint("Error when adding to cart: ${e.toString()}");
+      rethrow;
+    }
+  }
+
+
+  static Future<List<Item>> fetchRangedCartItems({
+    required int start,
+    required int end,
+    required String userID
+  })
+  async {
+    final List<Map<String, dynamic>> response = await supabase
+      .from("user_cart")
+      // join user_cart with INNER_JOIN(catalog, user_profile)
+      .select("item_quantity, catalog!inner(*, user_profiles(*))")
+      .eq("user_id", userID)
+      .range(start, end);
+
+    return (response)
+      .map((row) => Item.fromCartRow(row))
+      .toList();
+  }
+
 }
