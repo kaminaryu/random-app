@@ -67,7 +67,7 @@ class ListingCard extends StatelessWidget {
                 // ── Info column ──
                 Expanded(
                   child: SizedBox(
-                    height: 120,
+                    height: 128,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
