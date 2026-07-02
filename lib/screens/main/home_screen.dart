@@ -82,7 +82,7 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           children: [
             HomeHero(),
-            SectionTitle("Catalogs"),
+            SectionTitle("Recently Uploaded Products"),
             SizedBox(height: 16),
 
             _buildCatalog()
