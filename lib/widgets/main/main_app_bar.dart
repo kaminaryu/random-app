@@ -34,6 +34,7 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
           stream: Supabase.instance.client.auth.onAuthStateChange,
           builder: (context, snapshot) {
             bool loggedIn = false;
+            final String currentURI = GoRouterState.of(context).uri.toString();
 
             // check if the user is logged in
             if (snapshot.connectionState == ConnectionState.waiting) {
@@ -47,6 +48,10 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
 
             // change to cart icon when logged out
             if (loggedIn) {
+              if (currentURI == "/cart") {
+                return SizedBox();
+              }
+
               return Padding(
                 padding: EdgeInsets.only(right: 16.0),
                   child: IconButton(
@@ -58,15 +63,18 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
               );
             }
 
-            return ElevatedButton(
-              onPressed: () => context.push("/login"),
+            return Padding(
+              padding: EdgeInsets.only(right: 16.0),
+              child: ElevatedButton(
+                onPressed: () => context.push("/login"),
 
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Color(0x67676767),
-                foregroundColor: Colors.white,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Theme.of(context).colorScheme.tertiary,
+                  foregroundColor: Colors.white,
+                ),
+
+                child: Text("Login"),
               ),
-
-              child: Text("Login"),
             );
           }
         )
