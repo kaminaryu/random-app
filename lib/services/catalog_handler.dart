@@ -41,6 +41,7 @@ class CatalogHandler {
       response = await supabase
         .from("catalog")
         .select("*, user_profiles(*)")
+        .eq("is_public", true)
         .order(sortingOption.queryColumn, ascending: isAscending)
         .range(start, end);
     }
