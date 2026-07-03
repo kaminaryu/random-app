@@ -22,17 +22,18 @@ class _SearchScreenState extends State<SearchScreen> {
   static const double _minPriceRange = 0;
   static const double _maxPriceRange = 1000;
 
+  Future<List<Item>>? _searchFuture;
+
   SortingOptions _selectedSortingOption = SortingOptions.relevance;
   RangeValues _priceRange = RangeValues(_minPriceRange, _maxPriceRange);
   bool _isAscending = false;
-
-
 
   @override
   void dispose() {
     _searchController.dispose();
     super.dispose();
   }
+
 
   Widget _buildSearchRow() {
     return Row(
@@ -264,7 +265,16 @@ class _SearchScreenState extends State<SearchScreen> {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
-        onPressed: () => setState(() {}),
+        onPressed: () => setState(() {
+          _searchFuture = CatalogHandler.searchRangedItems(
+            page: _page,
+            query: _searchController.text,
+            priceStart: _priceRange.start,
+            priceEnd: _priceRange.end,
+            sortingOption: _selectedSortingOption,
+            isAscending: _isAscending,
+          );
+        }),
         style: ElevatedButton.styleFrom(
           backgroundColor: colorScheme.primary,
           foregroundColor: colorScheme.onPrimary,
@@ -276,29 +286,30 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 
+
   Widget _buildCatalog() {
     return Expanded(
       child: FutureBuilder<List<Item>>(
-        future: CatalogHandler.searchRangedItems(
-          page: _page,
-          query: _searchController.text,
-          priceStart: _priceRange.start,
-          priceEnd: _priceRange.end,
-          sortingOption: _selectedSortingOption,
-          isAscending: _isAscending
-        ),
+        future: _searchFuture,
         builder: (catalogContext, snapshot) {
-          if (_searchController.text.isEmpty) return Center(child: Text("You have not search anything yet."));
+          if (_searchFuture == null) {
+            return Center(child: Text("You have not search anything yet."));
+          }
 
-          if (snapshot.connectionState == ConnectionState.waiting) return Center(child: CircularProgressIndicator());
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          }
 
-          if (!snapshot.hasData || snapshot.data!.isEmpty) return SizedBox(child: Text("No result found."));
+          if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return SizedBox(child: Text("No result found."));
+          }
 
           return _buildCatalogGrid(snapshot.data!);
         }
       ),
     );
   }
+
 
   Widget _buildCatalogGrid(List<Item> items) {
     return GridView.builder(
@@ -315,7 +326,6 @@ class _SearchScreenState extends State<SearchScreen> {
       },
     );
   }
-
 
   @override
   Widget build(BuildContext context) {
