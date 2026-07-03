@@ -44,14 +44,12 @@ class _ListingsScreenState extends State<ListingsScreen> {
 
   Future<void> _fetchNextPage() async {
     setState(() => _isLoading = true);
-    final start = _items.length;
     final user = Supabase.instance.client.auth.currentUser;
     if (user == null) return;
 
     final items =
         await CatalogHandler.fetchRangedItems(
-          start: start,
-          end: start + _pageSize - 1,
+          page: 1,
           sortingOption: SortingOptions.uploadDate,
           userID: user.id,
         );

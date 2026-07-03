@@ -1,5 +1,6 @@
 import 'package:flutter/rendering.dart';
 import 'package:i_bazaar/models/item.dart';
+import 'package:i_bazaar/services/catalog_handler.dart';
 import 'package:i_bazaar/services/listing_handler.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -128,11 +129,14 @@ class CartHandler {
 
 
   static Future<List<Item>> fetchRangedCartItems({
-    required int start,
-    required int end,
+    required int page,
     required String userID
   })
   async {
+    // 1 based indexing cuz normal people uses ts
+    final start = (page - 1) * CatalogHandler.pageSize;
+    final end   = start + (CatalogHandler.pageSize - 1);
+
     final List<Map<String, dynamic>> response = await supabase
       .from("user_cart")
       // join user_cart with INNER_JOIN(catalog, user_profile)

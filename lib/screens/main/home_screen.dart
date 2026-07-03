@@ -16,8 +16,7 @@ class _HomeScreenState extends State<HomeScreen> {
   List catalog = [];
   bool isLoading = true;
 
-  final int _startSearch = 0;
-  final int _endSearch   = 20;
+  final int _page = 1;
 
   @override
   void initState() {
@@ -27,8 +26,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> fetchCatalog() async {
     final result = await CatalogHandler.fetchRangedItems(
-      start: _startSearch,
-      end: _endSearch,
+      page: _page,
       sortingOption: SortingOptions.uploadDate,
     );
     setState(() {
@@ -40,8 +38,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildCatalog() {
     return FutureBuilder<List<Item>>(
       future: CatalogHandler.fetchRangedItems(
-        start: _startSearch,
-        end: _endSearch,
+        page: _page,
         sortingOption: SortingOptions.uploadDate,
       ),
       builder: (catalogContext, snapshot) {

@@ -15,20 +15,31 @@ enum SortingOptions {
 }
 
 
+
 class CatalogHandler {
+  static const int pageSize = 20;
+
   static final supabase = Supabase.instance.client;
-  // caching feature, unused rn cuz headache
-  // static final Map<String, Item> _items = {};
 
   static Future<List<Item>> fetchRangedItems({
-    required int start,
-    required int end,
+    required int page,
     required SortingOptions sortingOption,
     bool isAscending = false,
     String? userID
   })
   async {
     final List<Map<String, dynamic>> response;
+
+    // 1 based indexing cuz normal people uses ts
+    final start = (page - 1) * pageSize;
+    final end   = start + (pageSize - 1);
+
+    // check if the query if cached
+    final queryKey = CacheHandler.generateQuerykey(sortingOption: sortingOption, page: page);
+    final List<Item>? queryInCache = CacheHandler.findQueryInCache(queryKey);
+
+    if (queryInCache != null) return queryInCache;
+
 
     if (userID != null) {
       response = await supabase
@@ -48,19 +59,24 @@ class CatalogHandler {
     }
 
     // covert postgres rows to items
-    return (response)
+    final queryList = response
       .map((row) => Item.fromMapToItem(row))
       .toList();
+
+    CacheHandler.addQueryToCache(queryKey, queryList);
+
+    return queryList;
   }
+
 
   static String fetchImageUrl(String sellerID, String itemID) {
     final path = "$sellerID/$itemID.jpg";
     return supabase.storage.from("catalog-images").getPublicUrl(path);
   }
 
+
   static Future<List<Item>> searchRangedItems({
-    required int start,
-    required int end,
+    required int page,
     required String query,
     required SortingOptions sortingOption,
     required double priceStart,
@@ -68,7 +84,19 @@ class CatalogHandler {
     bool isAscending = false,
   })
   async {
-    if (priceEnd == 1000) priceEnd = 999999;
+    // make the price end range "infinite" if the user slides to the end
+    if (priceEnd == 1000) priceEnd = 999_999_999;
+
+    // 1 based indexing cuz normal people uses ts
+    final start = (page - 1) * pageSize;
+    final end   = start + (pageSize - 1);
+
+    // check if the query if cached
+    final queryKey = CacheHandler.generateQuerykey(sortingOption: sortingOption, priceStart: priceStart, priceEnd: priceEnd, page: page, query: query);
+    final List<Item>? queryInCache = CacheHandler.findQueryInCache(queryKey);
+
+    if (queryInCache != null) return queryInCache;
+
 
     final List<Map<String, dynamic>> response = await supabase.rpc(
       "search_catalogs",
@@ -83,25 +111,27 @@ class CatalogHandler {
       }
     );
 
-    return (response)
+    final queryList = response
       .map((row) => Item.fromMapToItem(row))
       .toList();
+
+    CacheHandler.addQueryToCache(queryKey, queryList);
+
+    return queryList;
   }
+
 
   static Future<Item> fetchItem(String itemID) async {
     // do not call db if item is already cached
     final Item? itemInCache = CacheHandler.findItemInCache(itemID);
 
-    if (itemInCache != null) {
-      return itemInCache;
-    }
+    if (itemInCache != null) return itemInCache;
 
 
     final List<Map<String, dynamic>> response = await supabase
       .from("catalog")
       .select("*, user_profiles(*)")
       .eq("id", itemID);
-
 
     final Map<String, dynamic>? row = response.firstOrNull;
 
@@ -114,11 +144,6 @@ class CatalogHandler {
     // cache the item
     CacheHandler.addItemToCache(item);
 
- 
     return item;
   }
-
-  // static void clearCache() {
-  //   _items.clear();
-  // }
 }

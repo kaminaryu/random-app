@@ -18,8 +18,7 @@ class _SearchScreenState extends State<SearchScreen> {
   final ValueNotifier<bool> _isFiltering = ValueNotifier<bool>(false);
   final ValueNotifier<bool> _isSorting   = ValueNotifier<bool>(false);
 
-  static const int _startSearch = 0;
-  static const int _endSearch   = 20;
+  static const int _page = 1;
   static const double _minPriceRange = 0;
   static const double _maxPriceRange = 1000;
 
@@ -281,8 +280,7 @@ class _SearchScreenState extends State<SearchScreen> {
     return Expanded(
       child: FutureBuilder<List<Item>>(
         future: CatalogHandler.searchRangedItems(
-          start: _startSearch,
-          end: _endSearch,
+          page: _page,
           query: _searchController.text,
           priceStart: _priceRange.start,
           priceEnd: _priceRange.end,

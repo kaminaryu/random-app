@@ -16,7 +16,7 @@ class CartScreen extends StatefulWidget {
 class _CartScreenState extends State<CartScreen> {
   List<Item> _items = [];
   bool _isLoading = true;
-  static const _limit = 20;
+  static const _page = 1;
 
   @override
   void initState() {
@@ -30,8 +30,7 @@ class _CartScreenState extends State<CartScreen> {
 
     setState(() => _isLoading = true);
     final items = await CartHandler.fetchRangedCartItems(
-      start: 0,
-      end: _limit - 1,
+      page: _page,
       userID: user.id,
     );
     if (!mounted) return;
