@@ -55,8 +55,8 @@ class CacheHandler {
   ///////////////////////////
  
   // -> query key => 'sort|filter|page|searchQuery'
-  static String generateQuerykey({required SortingOptions sortingOption, double priceStart=0, double priceEnd=999_999_999, required int page, String query=""}) {
-    return "$sortingOption|PriceRange($priceStart,$priceEnd)|$page|$query";
+  static String generateQuerykey({required SortingOptions sortingOption, String filter="", required int page, String query=""}) {
+    return "$sortingOption|$filter|$page|$query";
   }
 
 

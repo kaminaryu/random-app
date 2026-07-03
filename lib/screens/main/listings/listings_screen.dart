@@ -133,8 +133,7 @@ class _ListingsScreenState extends State<ListingsScreen> {
                           ),
                         );
                       }
-                      return ListingCard(
-                          _items[index], refreshScreen: _refresh);
+                      return ListingCard(_items[index], refreshScreen: _refresh);
                     },
                   );
 

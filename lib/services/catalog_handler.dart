@@ -29,19 +29,21 @@ class CatalogHandler {
   })
   async {
     final List<Map<String, dynamic>> response;
+    final String queryKey;
 
     // 1 based indexing cuz normal people uses ts
     final start = (page - 1) * pageSize;
     final end   = start + (pageSize - 1);
 
-    // check if the query if cached
-    final queryKey = CacheHandler.generateQuerykey(sortingOption: sortingOption, page: page);
-    final List<Item>? queryInCache = CacheHandler.findQueryInCache(queryKey);
-
-    if (queryInCache != null) return queryInCache;
-
-
+    // if requested for specufic user's
     if (userID != null) {
+      // check if the query if cached
+      queryKey = CacheHandler.generateQuerykey(sortingOption: sortingOption, filter: "UserID($userID)" ,page: page);
+
+      final List<Item>? queryInCache = CacheHandler.findQueryInCache(queryKey);
+
+      if (queryInCache != null) return queryInCache;
+
       response = await supabase
         .from("catalog")
         .select("*, user_profiles(*)")
@@ -50,6 +52,12 @@ class CatalogHandler {
         .range(start, end);
     }
     else {
+      // check if the query if cached
+      queryKey = CacheHandler.generateQuerykey(sortingOption: sortingOption, page: page);
+      final List<Item>? queryInCache = CacheHandler.findQueryInCache(queryKey);
+
+      if (queryInCache != null) return queryInCache;
+
       response = await supabase
         .from("catalog")
         .select("*, user_profiles(*)")
@@ -92,7 +100,7 @@ class CatalogHandler {
     final end   = start + (pageSize - 1);
 
     // check if the query if cached
-    final queryKey = CacheHandler.generateQuerykey(sortingOption: sortingOption, priceStart: priceStart, priceEnd: priceEnd, page: page, query: query);
+    final queryKey = CacheHandler.generateQuerykey(sortingOption: sortingOption, filter: "$priceStart,$priceEnd", page: page, query: query);
     final List<Item>? queryInCache = CacheHandler.findQueryInCache(queryKey);
 
     if (queryInCache != null) return queryInCache;
