@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:i_bazaar/app_scroll_behavior.dart';
 import 'package:i_bazaar/routers/router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -27,6 +28,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
+      scrollBehavior: AppScrollBehavior(), // so that we can mouse-drag on linux/web
 
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Color(0xFF5A189A)),
