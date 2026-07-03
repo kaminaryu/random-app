@@ -38,20 +38,19 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildCatalog() {
-    return 
-       FutureBuilder<List<Item>>(
-        future: CatalogHandler.fetchRangedItems(
-          start: _startSearch,
-          end: _endSearch,
-          sortingOption: SortingOptions.uploadDate,
-        ),
-        builder: (catalogContext, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) return Center(child: CircularProgressIndicator());
+    return FutureBuilder<List<Item>>(
+      future: CatalogHandler.fetchRangedItems(
+        start: _startSearch,
+        end: _endSearch,
+        sortingOption: SortingOptions.uploadDate,
+      ),
+      builder: (catalogContext, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) return Center(child: CircularProgressIndicator());
 
-          if (!snapshot.hasData || snapshot.data!.isEmpty) return SizedBox(child: Text("Error Displaying Catalog."));
+        if (!snapshot.hasData || snapshot.data!.isEmpty) return SizedBox(child: Text("Error Displaying Catalog."));
 
-          return _buildCatalogGrid(snapshot.data!);
-        }
+        return _buildCatalogGrid(snapshot.data!);
+      }
     );
   }
 
@@ -77,8 +76,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SingleChildScrollView(
+    return SingleChildScrollView(
         child: Column(
           children: [
             HomeHero(),
@@ -88,7 +86,6 @@ class _HomeScreenState extends State<HomeScreen> {
             _buildCatalog()
           ],
         ),
-      ),
     );
   }
 }

@@ -1,38 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-class MainNavBar extends StatefulWidget {
+class MainNavBar extends StatelessWidget {
   const MainNavBar({super.key});
 
-  @override
-  State<MainNavBar> createState() => _MainNavBarState();
-}
-
-class _MainNavBarState extends State<MainNavBar> {
-  int currentPage = 0;
-
-  void changePage(int page) {
-    switch (page) {
-      case 0: context.go("/");
-      case 1: context.go("/search");
-      case 2: context.go("/listings");
-      case 3: context.go("/profile");
-    }
-    setState(() {
-      currentPage = page;
-    });
-  }
+  static const List<String> _tabOrder = ['/', '/search', '/listings', '/profile'];
 
   @override
   Widget build(BuildContext context) {
-    return BottomNavigationBar(
-      currentIndex: currentPage,
-      onTap: changePage,
-      backgroundColor: Color(0xFF1A1740),
-      selectedItemColor: Color(0xFF7F77DD),
-      unselectedItemColor: Color(0xFFCECBF6),
+    final uri = GoRouterState.of(context).uri.toString();
+    final currentIndex = _tabOrder.indexOf(uri);
 
-      items: [
+    return BottomNavigationBar(
+      currentIndex: currentIndex == -1 ? 0 : currentIndex,
+      onTap: (page) {
+        switch (page) {
+          case 0: context.go("/");
+          case 1: context.go("/search");
+          case 2: context.go("/listings");
+          case 3: context.go("/profile");
+        }
+      },
+      backgroundColor: const Color(0xFF1A1740),
+      selectedItemColor: const Color(0xFF7F77DD),
+      unselectedItemColor: const Color(0xFFCECBF6),
+      items: const [
         BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
         BottomNavigationBarItem(icon: Icon(Icons.search), label: "Search"),
         BottomNavigationBarItem(icon: Icon(Icons.sell), label: "My Listings"),

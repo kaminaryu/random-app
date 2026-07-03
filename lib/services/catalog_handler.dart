@@ -1,4 +1,5 @@
 import 'package:i_bazaar/models/item.dart';
+import 'package:i_bazaar/services/cache_handler.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 
@@ -89,7 +90,12 @@ class CatalogHandler {
 
   static Future<Item> fetchItem(String itemID) async {
     // do not call db if item is already cached
-    // if (_items.containsKey(itemID)) return _items[itemID]!;
+    final Item? itemInCache = CacheHandler.findItemInCache(itemID);
+
+    if (itemInCache != null) {
+      return itemInCache;
+    }
+
 
     final List<Map<String, dynamic>> response = await supabase
       .from("catalog")
@@ -106,7 +112,8 @@ class CatalogHandler {
     final item = Item.fromMapToItem(row);
 
     // cache the item
-    // _items[itemID] = item;
+    CacheHandler.addItemToCache(item);
+
  
     return item;
   }

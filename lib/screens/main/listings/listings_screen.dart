@@ -79,80 +79,80 @@ class _ListingsScreenState extends State<ListingsScreen> {
   }
 
   Widget _buildListings() {
-    if (_items.isEmpty && !_isLoading) {
-      return Scaffold(
-        floatingActionButton: FloatingActionButton(
-          onPressed: _navigateToCreate,
-          backgroundColor: Theme.of(context).colorScheme.primary,
-          child: const Icon(Icons.add),
-        ),
-
-        body: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text("You have no listed product."),
-              TextButton(
-                onPressed: () {},
-                child: Text(
-                  "Upload one now!",
-                  style: TextStyle(decoration: TextDecoration.underline),
+    final body = _items.isEmpty && !_isLoading
+        ? Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const Text("You have no listed product."),
+                TextButton(
+                  onPressed: () {},
+                  child: const Text(
+                    "Upload one now!",
+                    style: TextStyle(decoration: TextDecoration.underline),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           )
-        )
-      );
-    }
-
-    return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        onPressed: _navigateToCreate,
-        backgroundColor: const Color(0xFF7F77DD),
-        child: const Icon(Icons.add),
-      ),
-      body: _items.isEmpty && _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : _items.isEmpty
-            ? Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.inventory_2_outlined,
-                        size: 64, color: Colors.white38),
-                    const SizedBox(height: 16),
-                    Text(
-                      'No listings yet',
-                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                            color: Colors.white54,
-                          ),
+        : _items.isEmpty && _isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : _items.isEmpty
+                ? Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.inventory_2_outlined,
+                            size: 64, color: Colors.white38),
+                        const SizedBox(height: 16),
+                        Text(
+                          'No listings yet',
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleSmall
+                              ?.copyWith(color: Colors.white54),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              )
-            : GridView.builder(
-                controller: _scrollController,
-                padding: const EdgeInsets.all(16),
-                gridDelegate:
-                    const SliverGridDelegateWithMaxCrossAxisExtent(
-                  maxCrossAxisExtent: double.infinity,
-                  mainAxisExtent: 156,
-                  mainAxisSpacing: 16,
-                ),
-                itemCount: _items.length + (_hasMore ? 1 : 0),
-                itemBuilder: (context, index) {
-                  if (index >= _items.length) {
-                    return const Center(
-                      child: Padding(
-                        padding: EdgeInsets.all(16),
-                        child: CircularProgressIndicator(),
-                      ),
-                    );
-                  }
-                  return ListingCard(_items[index], refreshScreen: _refresh);
-                },
-              ),
+                  )
+                : GridView.builder(
+                    controller: _scrollController,
+                    padding: const EdgeInsets.all(16),
+                    gridDelegate:
+                        const SliverGridDelegateWithMaxCrossAxisExtent(
+                      maxCrossAxisExtent: double.infinity,
+                      mainAxisExtent: 156,
+                      mainAxisSpacing: 16,
+                    ),
+                    itemCount: _items.length + (_hasMore ? 1 : 0),
+                    itemBuilder: (context, index) {
+                      if (index >= _items.length) {
+                        return const Center(
+                          child: Padding(
+                            padding: EdgeInsets.all(16),
+                            child: CircularProgressIndicator(),
+                          ),
+                        );
+                      }
+                      return ListingCard(
+                          _items[index], refreshScreen: _refresh);
+                    },
+                  );
+
+    return Stack(
+      children: [
+        body,
+        Positioned(
+          right: 16,
+          bottom: 16,
+          child: FloatingActionButton(
+            onPressed: _navigateToCreate,
+            backgroundColor: Theme.of(context).colorScheme.primary,
+            child: const Icon(Icons.add),
+          ),
+        ),
+      ],
     );
   }
 

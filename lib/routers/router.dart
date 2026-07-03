@@ -37,15 +37,12 @@ final router = GoRouter(
     ),
 
     ShellRoute(
-      builder: (context, state, child) => MainScreen(
-        currentPath: state.uri.toString(),
-        child: child
-      ),
+      builder: (context, state, child) => MainScreen(/* currentPath: state.uri.toString(), */ child: child),
       routes: [
-        GoRoute(path: "/", builder:  (context, state) => HomeScreen()),
-        GoRoute(path: "/search", builder:  (context, state) => SearchScreen()),
-        GoRoute(path: "/listings", builder: (context, state) => ListingsScreen()),
-        GoRoute(path: "/profile", builder: (context, state) => ProfileScreen()),
+        GoRoute(path: "/",         pageBuilder: (context, state)  => NoTransitionPage(child: HomeScreen())),
+        GoRoute(path: "/search",   pageBuilder: (context, state)  => NoTransitionPage(child: SearchScreen())),
+        GoRoute(path: "/listings", pageBuilder: (context, state)  => NoTransitionPage(child: ListingsScreen())),
+        GoRoute(path: "/profile",  pageBuilder: (context, state)  => NoTransitionPage(child: ProfileScreen())),
     ])
   ]
 );
