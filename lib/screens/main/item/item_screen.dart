@@ -5,14 +5,38 @@ import 'package:i_bazaar/screens/main/item/widgets/add_to_cart_dialog.dart';
 import 'package:i_bazaar/screens/main/item/widgets/item_details.dart';
 import 'package:i_bazaar/screens/main/item/widgets/item_metadata_label.dart';
 import 'package:i_bazaar/screens/main/item/widgets/item_thumbnail.dart';
+import 'package:i_bazaar/services/cache_handler.dart';
 import 'package:i_bazaar/services/cart_handler.dart';
 import 'package:i_bazaar/services/catalog_handler.dart';
 import 'package:i_bazaar/widgets/main/main_app_bar.dart';
 
-class ItemScreen extends StatelessWidget {
+class ItemScreen extends StatefulWidget {
   const ItemScreen({super.key, required this.itemID});
-
   final String itemID;
+
+  @override
+  State<ItemScreen> createState() => _ItemScreenState();
+}
+
+class _ItemScreenState extends State<ItemScreen> {
+  late Future<Item> _itemFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _itemFuture = CatalogHandler.fetchItem(widget.itemID);
+  }
+
+  Future<void> _refresh() async {
+    setState(() {
+      // remove the cache and refresh the page
+      CacheHandler.removeItemFromCache(widget.itemID);
+      _itemFuture = CatalogHandler.fetchItem(widget.itemID);
+    });
+
+    // waut til finish refreshing
+    await _itemFuture;
+  }
 
   Widget _buildItemScreen(Item item, ThemeData theme) {
     return SingleChildScrollView(
@@ -20,13 +44,9 @@ class ItemScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           ItemThumbnail(item: item, theme: theme),
-
           ItemMetadataLabel(item: item, theme: theme),
-
           ItemDetails(item: item, theme: theme),
-
-          // because of FAB
-          SizedBox(height: 64),
+          const SizedBox(height: 64),
         ],
       ),
     );
@@ -35,7 +55,7 @@ class ItemScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<Item>(
-      future: CatalogHandler.fetchItem(itemID),
+      future: _itemFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(
@@ -43,6 +63,7 @@ class ItemScreen extends StatelessWidget {
             body: Center(child: CircularProgressIndicator()),
           );
         }
+
         if (!snapshot.hasData) {
           return const Scaffold(
             appBar: MainAppBar(),
@@ -54,9 +75,10 @@ class ItemScreen extends StatelessWidget {
 
         return Scaffold(
           appBar: MainAppBar(label: item.name),
-
-          body: _buildItemScreen(item, Theme.of(context)),
-
+          body: RefreshIndicator(
+            onRefresh: _refresh,
+            child: _buildItemScreen(item, Theme.of(context)),
+          ),
           floatingActionButton: AddToCartButton(
             price: item.price,
             onPressed: () => showDialog(
@@ -65,8 +87,8 @@ class ItemScreen extends StatelessWidget {
                 item: item,
                 onConfirm: (amount) {
                   CartHandler.addItemToCart(itemID: item.id, quantity: amount);
-                }
-              )
+                },
+              ),
             ),
           ),
           floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
