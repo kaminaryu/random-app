@@ -146,7 +146,7 @@ class _ListingsScreenState extends State<ListingsScreen> {
           bottom: 16,
           child: FloatingActionButton(
             onPressed: _navigateToCreate,
-            backgroundColor: Theme.of(context).colorScheme.primary,
+            backgroundColor: Theme.of(context).colorScheme.tertiary,
             child: const Icon(Icons.add),
           ),
         ),
