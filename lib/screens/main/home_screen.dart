@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:i_bazaar/models/item.dart';
+import 'package:i_bazaar/services/cache_handler.dart';
 import 'package:i_bazaar/services/catalog_handler.dart';
 import 'package:i_bazaar/widgets/homepage/hero.dart';
 import 'package:i_bazaar/widgets/homepage/item_card.dart';
@@ -15,6 +16,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   List catalog = [];
   bool isLoading = true;
+  late Future<List<Item>> _futureFunction;
 
   final int _page = 1;
 
@@ -22,7 +24,28 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     fetchCatalog();
+    _futureFunction = CatalogHandler.fetchRangedItems(
+      page: _page,
+      sortingOption: SortingOptions.uploadDate,
+    );
   }
+
+  Future<void> _refresh() async {
+    setState(() {
+      // refresh the grid
+      final String queryKey = CacheHandler.generateQuerykey(sortingOption: SortingOptions.uploadDate, page: _page);
+      CacheHandler.removeQueryFromCache(queryKey);
+
+      _futureFunction = CatalogHandler.fetchRangedItems(
+        page: _page,
+        sortingOption: SortingOptions.uploadDate,
+      );
+    });
+
+    // await the refreshing
+    await _futureFunction;
+  }
+
 
   Future<void> fetchCatalog() async {
     final result = await CatalogHandler.fetchRangedItems(
@@ -37,10 +60,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildCatalog() {
     return FutureBuilder<List<Item>>(
-      future: CatalogHandler.fetchRangedItems(
-        page: _page,
-        sortingOption: SortingOptions.uploadDate,
-      ),
+      future: _futureFunction,
       builder: (catalogContext, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) return Center(child: CircularProgressIndicator());
 
@@ -73,7 +93,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
+    return RefreshIndicator(
+      onRefresh: _refresh,
+      child: SingleChildScrollView(
         child: Column(
           children: [
             HomeHero(),
@@ -83,6 +105,7 @@ class _HomeScreenState extends State<HomeScreen> {
             _buildCatalog()
           ],
         ),
+      ),
     );
   }
 }

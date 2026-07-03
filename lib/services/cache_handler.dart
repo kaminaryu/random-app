@@ -92,7 +92,7 @@ class CacheHandler {
   }
 
 
-  static void removeQueryFromCache(String itemID) {
-    _items.remove(itemID);
+  static void removeQueryFromCache(String queryKey) {
+    _itemQueries.remove(queryKey);
   }
 }
