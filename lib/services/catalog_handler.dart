@@ -92,18 +92,18 @@ class CatalogHandler {
     bool isAscending = false,
   })
   async {
-    // make the price end range "infinite" if the user slides to the end
-    if (priceEnd == 1000) priceEnd = 999_999_999;
-
     // 1 based indexing cuz normal people uses ts
     final start = (page - 1) * pageSize;
     final end   = start + (pageSize - 1);
 
     // check if the query if cached
-    final queryKey = CacheHandler.generateQuerykey(sortingOption: sortingOption, filter: "$priceStart,$priceEnd", page: page, query: query);
+    final queryKey = CacheHandler.generateQuerykey(sortingOption: sortingOption, filter: "PriceRange($priceStart,$priceEnd)", page: page, query: query);
     final List<Item>? queryInCache = CacheHandler.findQueryInCache(queryKey);
 
     if (queryInCache != null) return queryInCache;
+
+    // make the price end range "infinite" if the user slides to the end
+    if (priceEnd == 1000) priceEnd = 999_999_999;
 
 
     final List<Map<String, dynamic>> response = await supabase.rpc(

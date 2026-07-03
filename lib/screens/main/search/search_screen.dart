@@ -2,6 +2,7 @@
 // but it works... i think
 import 'package:flutter/material.dart';
 import 'package:i_bazaar/models/item.dart';
+import 'package:i_bazaar/services/cache_handler.dart';
 import 'package:i_bazaar/services/catalog_handler.dart';
 import 'package:i_bazaar/widgets/homepage/item_card.dart';
 
@@ -32,6 +33,43 @@ class _SearchScreenState extends State<SearchScreen> {
   void dispose() {
     _searchController.dispose();
     super.dispose();
+  }
+
+  Future<void> _search() async {
+    setState(() {
+      _searchFuture = CatalogHandler.searchRangedItems(
+        page: _page,
+        query: _searchController.text,
+        priceStart: _priceRange.start,
+        priceEnd: _priceRange.end,
+        sortingOption: _selectedSortingOption,
+        isAscending: _isAscending,
+      );
+    });
+  }
+
+  Future<void> _refresh() async {
+    final double priceStart = _priceRange.start;
+    final double priceEnd   = _priceRange.end;
+
+    final String queryKey = CacheHandler.generateQuerykey(
+      sortingOption: _selectedSortingOption,
+      filter: "PriceRange($priceStart,$priceEnd)",
+      page: _page,
+      query: _searchController.text,
+    );
+    CacheHandler.removeQueryFromCache(queryKey);
+
+    setState(() {
+      _searchFuture = CatalogHandler.searchRangedItems(
+        page: _page,
+        query: _searchController.text,
+        priceStart: priceStart,
+        priceEnd: priceEnd,
+        sortingOption: _selectedSortingOption,
+        isAscending: _isAscending,
+      );
+    });
   }
 
 
@@ -265,16 +303,7 @@ class _SearchScreenState extends State<SearchScreen> {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
-        onPressed: () => setState(() {
-          _searchFuture = CatalogHandler.searchRangedItems(
-            page: _page,
-            query: _searchController.text,
-            priceStart: _priceRange.start,
-            priceEnd: _priceRange.end,
-            sortingOption: _selectedSortingOption,
-            isAscending: _isAscending,
-          );
-        }),
+        onPressed: () => _search(),
         style: ElevatedButton.styleFrom(
           backgroundColor: colorScheme.primary,
           foregroundColor: colorScheme.onPrimary,
@@ -312,18 +341,21 @@ class _SearchScreenState extends State<SearchScreen> {
 
 
   Widget _buildCatalogGrid(List<Item> items) {
-    return GridView.builder(
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 16.0,
-        mainAxisSpacing: 8.0,
-        childAspectRatio: 9/16,
-      ),
+    return RefreshIndicator(
+      onRefresh: _refresh,
+      child: GridView.builder(
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          crossAxisSpacing: 16.0,
+          mainAxisSpacing: 8.0,
+          childAspectRatio: 9/16,
+        ),
 
-      itemCount: items.length,
-      itemBuilder: (itemContext, index) {
-        return ItemCard(items[index]);
-      },
+        itemCount: items.length,
+        itemBuilder: (itemContext, index) {
+          return ItemCard(items[index]);
+        },
+      ),
     );
   }
 
