@@ -55,6 +55,10 @@ class CacheHandler {
   ///////////////////////////
  
   // -> query key => 'sort|filter|page|searchQuery'
+  // Filter Naming Scheme:
+  //  (i need to make a better system than ts lmao)
+  //  UserID($userID)
+  //  PriceRange($start,$end)
   static String generateQuerykey({required SortingOptions sortingOption, String filter="", required int page, String query=""}) {
     return "$sortingOption|$filter|$page|$query";
   }

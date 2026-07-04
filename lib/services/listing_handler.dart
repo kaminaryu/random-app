@@ -60,6 +60,7 @@ class ListingHandler {
     // return Item.fromMap((response as List).first);
   }
 
+
   static Future<void> updateListing({
     required String itemID,
     required String name,

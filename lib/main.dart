@@ -31,7 +31,7 @@ class MyApp extends StatelessWidget {
       scrollBehavior: AppScrollBehavior(), // so that we can mouse-drag on linux/web
 
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Color(0xFF5A189A)),
+        colorScheme: ColorScheme.fromSeed(seedColor: Color(0xFF9E4EDD)),
         textTheme: const TextTheme(
           titleSmall: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
           bodyLarge: TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
