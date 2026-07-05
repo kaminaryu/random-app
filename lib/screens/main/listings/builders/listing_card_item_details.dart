@@ -102,7 +102,7 @@ class ListingCardItemDetails {
   static Widget _priceStockSection({required String value, required String label, required ColorScheme colorScheme}) {
     return Expanded(
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 16), 
+        padding: EdgeInsets.symmetric(horizontal: 8), 
         child: Column(
           children: [
             Text(
