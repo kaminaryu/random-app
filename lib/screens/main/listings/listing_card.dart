@@ -13,7 +13,7 @@ class ListingCard extends StatefulWidget {
   static const double cardHeight       = 128.0;
   static const double cardSpacing      = 12.0;
   static const double cardBorderRadius = 20.0;
-  static const double thumbnailSize         = 86.0;
+  static const double thumbnailSize         = 96.0;
   static const double thumbnailPadding      = 12.0;
   static const double thumbnailBorderRadius = cardBorderRadius - thumbnailPadding;
 
@@ -46,11 +46,11 @@ class _ListingCardState extends State<ListingCard> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ListingCardItemDetails.nameStatusRow(widget.item, colorScheme),
+            ListingCardItemDetails.nameStatusRatingRow(widget.item, colorScheme),
 
             ListingCardItemDetails.shortDesc(widget.item, colorScheme),
 
-            ListingCardItemDetails.priceRatingStock(widget.item, colorScheme),
+            ListingCardItemDetails.priceStockRow(widget.item, colorScheme),
           ],
         ),
       )

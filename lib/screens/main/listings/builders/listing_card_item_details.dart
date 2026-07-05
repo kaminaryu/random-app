@@ -2,7 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:i_bazaar/models/item.dart';
 
 class ListingCardItemDetails {
-  static Widget nameStatusRow(Item item, ColorScheme colorScheme) {
+  static Widget nameStatusRatingRow(Item item, ColorScheme colorScheme) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        _nameStaticSection(item, colorScheme),
+
+        _ratingSection(item, colorScheme),
+      ],
+    );
+  }
+
+  static Widget _nameStaticSection(Item item, ColorScheme colorScheme) {
     return Row(
       spacing: 8.0,
       children: [
@@ -33,6 +44,27 @@ class ListingCardItemDetails {
     );
   }
 
+  static Widget _ratingSection(Item item, ColorScheme colorScheme) {
+    return Row(
+      spacing: 4.0,
+      children: [
+        Icon(
+          Icons.star,
+          color: Colors.amber,
+          size: 16.0,
+        ),
+
+        Text(
+          item.rating.toStringAsFixed(2),
+          style: TextStyle(
+            color: Colors.amber,
+            fontSize: 14.0
+          ),
+        ),
+      ]
+    );
+  }
+
 
   static Widget shortDesc(Item item, ColorScheme colorScheme) {
     return Text(
@@ -48,24 +80,26 @@ class ListingCardItemDetails {
   }
 
 
-  static Widget priceRatingStock(Item item, ColorScheme colorScheme) {
+  static Widget priceStockRow(Item item, ColorScheme colorScheme) {
     return Column(
       children: [
         _horizontalDivider(),
 
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            _priceRatingStockSection(value: "RM ${item.price.toStringAsFixed(2)}", label: "Price",  colorScheme: colorScheme),
-            _priceRatingStockSection(value: "★ ${item.rating}", label: "Rating", colorScheme: colorScheme),
-            _priceRatingStockSection(value: "${item.stock}",    label: "Stock",  colorScheme: colorScheme),
-          ],
+        IntrinsicHeight(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              _priceStockSection(value: "RM ${item.price.toStringAsFixed(2)}", label: "Price",  colorScheme: colorScheme),
+              _verticalDivider(),
+              _priceStockSection(value: "${item.stock}",    label: "Stock",  colorScheme: colorScheme),
+            ],
+          ),
         ),
       ],
     );
   }
 
-  static Widget _priceRatingStockSection({required String value, required String label, required ColorScheme colorScheme}) {
+  static Widget _priceStockSection({required String value, required String label, required ColorScheme colorScheme}) {
     return Expanded(
       child: Column(
         children: [
@@ -77,6 +111,7 @@ class ListingCardItemDetails {
               fontWeight: FontWeight.w500,
             ),
           ),
+
           Text(
             label,
             style: TextStyle(
@@ -93,20 +128,20 @@ class ListingCardItemDetails {
   static Widget _horizontalDivider() {
     return Container(
       height: 1,
-      margin: EdgeInsets.symmetric(vertical: 4.0),
+      margin: EdgeInsets.symmetric(vertical: 8.0),
       decoration: BoxDecoration(
         color: Colors.white.withAlpha(67),
       ),
     );
   }
 
-  // static Widget _verticalDivider() {
-  //   return Container(
-  //     width: 1,
-  //     margin: EdgeInsets.symmetric(horizontal: 4.0),
-  //     decoration: BoxDecoration(
-  //       color: Colors.white.withAlpha(67),
-  //     ),
-  //   );
-  // }
+  static Widget _verticalDivider() {
+    return Container(
+      width: 1,
+      margin: EdgeInsets.symmetric(horizontal: 4.0),
+      decoration: BoxDecoration(
+        color: Colors.white.withAlpha(67),
+      ),
+    );
+  }
 }
