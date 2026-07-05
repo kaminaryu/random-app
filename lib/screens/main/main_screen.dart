@@ -1,18 +1,57 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:i_bazaar/widgets/main/main_app_bar.dart';
 import 'package:i_bazaar/widgets/main/main_nav_bar.dart';
 
-class MainScreen extends StatelessWidget {
+class MainScreen extends StatefulWidget {
   const MainScreen({super.key, required this.child});
 
   final Widget child;
 
   @override
+  State<MainScreen> createState() => _MainScreenState();
+}
+
+class _MainScreenState extends State<MainScreen> {
+  static const routes = ["/", "/search", "/listings", "/profile"];
+  int currentRouteIndex = 0;
+
+  void _goToLeftPage() {
+    if (currentRouteIndex == 0) return;
+
+    setState(() {
+      currentRouteIndex -= 1;
+    });
+    context.go(routes[currentRouteIndex]);
+  }
+
+  void _goToRightPage() {
+    if (currentRouteIndex == routes.length) return;
+
+    setState(() {
+      currentRouteIndex += 1;
+    });
+    context.go(routes[currentRouteIndex]);
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: MainAppBar(),
-      body: child,
-      bottomNavigationBar: MainNavBar(),
+    return GestureDetector(
+      onHorizontalDragEnd: (details) {
+        if (details.primaryVelocity! > 0) {
+          // swiping to the right
+          _goToLeftPage();
+        }
+        else if (details.primaryVelocity! < 0) {
+          // swiping to the left
+          _goToRightPage();
+        }
+      },
+      child: Scaffold(
+        appBar: MainAppBar(),
+        body: widget.child,
+        bottomNavigationBar: MainNavBar(),
+      ),
     );
   }
 }
