@@ -52,8 +52,25 @@ class _ListingCardState extends State<ListingCard> {
 
 
   Widget _buildThumnail() {
-    return Padding(
-      padding: EdgeInsets.all(ListingCard.thumbnailPadding),
+    return Stack(
+      children: [
+        _buildThumbnailImage(),
+        _buildVisibilityStatusLabel(),
+      ],
+    );
+  }
+
+  Widget _buildThumbnailImage() {
+    return Container(
+      margin: EdgeInsets.all(ListingCard.thumbnailPadding),
+      decoration: BoxDecoration(
+        border: Border.all(
+          color: Colors.black38,
+          width: 1,
+        ),
+        borderRadius: BorderRadius.circular(ListingCard.thumbnailBorderRadius),
+      ),
+
       child: ClipRRect(
         borderRadius: BorderRadius.circular(ListingCard.thumbnailBorderRadius),
         child: Image.network(
@@ -61,6 +78,31 @@ class _ListingCardState extends State<ListingCard> {
           width: ListingCard.thumbnailSize,
           height: ListingCard.thumbnailSize,
           fit: BoxFit.cover,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildVisibilityStatusLabel() {
+    return Positioned(
+      left: 0,
+      right: 0,
+      top: 4,
+      child: Align(
+        alignment: Alignment.topCenter,
+        child: Container(
+          padding: EdgeInsets.symmetric(vertical: 2.0, horizontal: 6.0),
+          decoration: BoxDecoration(
+            color: item.isPublic ? Colors.green : Colors.red,
+            borderRadius: BorderRadius.circular(16.0),
+          ),
+          child: Text(
+            item.isPublic ? "Public" : "Private",
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 10,
+            ),
+          )
         ),
       ),
     );
@@ -75,7 +117,7 @@ class _ListingCardState extends State<ListingCard> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ListingCardItemDetails.nameStatusRatingRow(item, colorScheme),
+            ListingCardItemDetails.nameRatingRow(item, colorScheme),
 
             ListingCardItemDetails.shortDesc(item, colorScheme),
 

@@ -2,45 +2,29 @@ import 'package:flutter/material.dart';
 import 'package:i_bazaar/models/item.dart';
 
 class ListingCardItemDetails {
-  static Widget nameStatusRatingRow(Item item, ColorScheme colorScheme) {
+  static Widget nameRatingRow(Item item, ColorScheme colorScheme) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        _nameStaticSection(item, colorScheme),
+        _nameStatusSection(item, colorScheme),
 
         _ratingSection(item, colorScheme),
       ],
     );
   }
 
-  static Widget _nameStaticSection(Item item, ColorScheme colorScheme) {
-    return Row(
-      spacing: 8.0,
-      children: [
-        Text(
-          item.name,
-          style: TextStyle(
-            fontSize: 20.0,
-            fontWeight: FontWeight.w700,
-            color: colorScheme.onPrimary,
-          ),
-        ),
+  static Widget _nameStatusSection(Item item, ColorScheme colorScheme) {
+    return Expanded(
+      child: Text(
+        item.name,
+        overflow: TextOverflow.ellipsis,
 
-        Container(
-          padding: EdgeInsets.symmetric(vertical: 2.0, horizontal: 6.0),
-          decoration: BoxDecoration(
-            color: item.isPublic ? Colors.green : Colors.red,
-            borderRadius: BorderRadius.circular(16.0),
-          ),
-          child: Text(
-            item.isPublic ? "Public" : "Private",
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 10,
-            ),
-          )
-        )
-      ],
+        style: TextStyle(
+          fontSize: 18.0,
+          fontWeight: FontWeight.w700,
+          color: colorScheme.onPrimary,
+        ),
+      ),
     );
   }
 
@@ -51,7 +35,7 @@ class ListingCardItemDetails {
         Icon(
           Icons.star,
           color: Colors.amber,
-          size: 16.0,
+          size: 14.0,
         ),
 
         Text(
