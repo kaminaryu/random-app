@@ -75,7 +75,7 @@ class _EditListingScreenState extends State<EditListingScreen> {
     setState(() => _isSubmitting = true);
 
     try {
-      await ListingHandler.updateListing(
+      final Item newItem = await ListingHandler.updateListing(
         itemID: widget.item.id,
         name: _nameController.text.trim(),
         price: double.parse(_priceController.text.trim()),
@@ -87,7 +87,7 @@ class _EditListingScreenState extends State<EditListingScreen> {
       );
 
       if (!mounted) return;
-      context.pop(true);
+      context.pop(newItem);
     } catch (e) {
       if (!mounted) return;
       AuthErrorSnackBar.show(
@@ -128,13 +128,13 @@ class _EditListingScreenState extends State<EditListingScreen> {
             ),
             TextButton(
               onPressed: () {
-                context.pop(true);
+                context.pop(true); /// pop the confirmation box
 
                 ListingHandler.deleteList(
                   sellerID: widget.item.sellerID,
                   itemID: widget.item.id
                 );
-                context.pop(true);
+                context.pop(Item.deleted());
               },
               child: Text('Confirm'),
             ),

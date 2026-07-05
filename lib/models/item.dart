@@ -29,6 +29,9 @@ class Item {
   final String sellerID;
   final String sellerName;
 
+  // refer to factory below
+  static const String deletedID = "Deleted";
+
 
   factory Item.fromMapToItem(Map<String, dynamic> row) {
     return Item(
@@ -63,6 +66,22 @@ class Item {
       createdAt:  DateTime.parse(catalog["item_created_at"]),
       sellerID:   catalog["user_id"],
       sellerName: catalog["user_profiles"]?["user_name"] ?? "Unknown User",
+    );
+  }
+
+  // for editing listings screen, after deleting the item from db, return this object to indicate item has been delete and not edited
+  factory Item.deleted() {
+    return Item(
+      id:         deletedID,
+      name:       "Deleted Item",
+      price:      0,
+      desc:       "",
+      stock:      0,
+      shortDesc:  "",
+      isPublic:   false,
+      createdAt:  DateTime.now(),
+      sellerID:   "",
+      sellerName: "",
     );
   }
 

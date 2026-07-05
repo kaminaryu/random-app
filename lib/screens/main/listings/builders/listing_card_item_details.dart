@@ -101,26 +101,30 @@ class ListingCardItemDetails {
 
   static Widget _priceStockSection({required String value, required String label, required ColorScheme colorScheme}) {
     return Expanded(
-      child: Column(
-        children: [
-          Text(
-            value,
-            style: TextStyle(
-              color: colorScheme.onPrimary,
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 16), 
+        child: Column(
+          children: [
+            Text(
+              value,
+              style: TextStyle(
+                color: colorScheme.onPrimary,
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
-          ),
 
-          Text(
-            label,
-            style: TextStyle(
-              color: colorScheme.onPrimary.withAlpha(200),
-              fontSize: 12,
-              fontWeight: FontWeight.w300,
+            Text(
+              label,
+              style: TextStyle(
+                color: colorScheme.onPrimary.withAlpha(200),
+                fontSize: 12,
+                fontWeight: FontWeight.w300,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

@@ -2,6 +2,7 @@ import 'dart:io';
 
 // import 'package:i_bazaar/models/item.dart';
 import 'package:flutter/widgets.dart';
+import 'package:i_bazaar/models/item.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
@@ -61,7 +62,7 @@ class ListingHandler {
   }
 
 
-  static Future<void> updateListing({
+  static Future<Item> updateListing({
     required String itemID,
     required String name,
     required double price,
@@ -88,7 +89,7 @@ class ListingHandler {
     final double roundedPrice = double.parse(price.toStringAsFixed(2));
 
     try {
-      await supabase
+      final List<Map<String, dynamic>> response = await supabase
         .from("catalog")
         .update({
           "item_name": name,
@@ -99,7 +100,14 @@ class ListingHandler {
           "is_public": isPublic,
           "user_id": sellerId,
         })
-        .eq("id", itemID);
+        .eq("id", itemID)
+        .select("*, user_profiles(*)");
+
+      return (response)
+        .map((row) => Item.fromMapToItem(row))
+        .toList()
+        .first;
+
     }
     catch (e) {
       // delete from bucket if failed so that there will be no orphaned image file
@@ -109,6 +117,7 @@ class ListingHandler {
 
       rethrow;
     }
+
   }
 
 
