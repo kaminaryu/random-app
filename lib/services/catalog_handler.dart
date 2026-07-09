@@ -25,7 +25,7 @@ class CatalogHandler {
     required int page,
     required SortingOptions sortingOption,
     bool isAscending = false,
-    String? userID
+    String? userId
   })
   async {
     final List<Map<String, dynamic>> response;
@@ -36,9 +36,9 @@ class CatalogHandler {
     final end   = start + (pageSize - 1);
 
     // if requested for specufic user's
-    if (userID != null) {
+    if (userId != null) {
       // check if the query if cached
-      queryKey = CacheHandler.generateQuerykey(sortingOption: sortingOption, filter: "UserID($userID)" ,page: page);
+      queryKey = CacheHandler.generateQuerykey(sortingOption: sortingOption, filter: "UserId($userId)" ,page: page);
 
       final List<Item>? queryInCache = CacheHandler.findQueryInCache(queryKey);
 
@@ -47,7 +47,7 @@ class CatalogHandler {
       response = await supabase
         .from("catalog")
         .select("*, user_profiles(*)")
-        .eq("user_id", userID)
+        .eq("user_id", userId)
         .order(sortingOption.queryColumn, ascending: isAscending)
         .range(start, end);
     }
@@ -77,8 +77,8 @@ class CatalogHandler {
   }
 
 
-  static String fetchImageUrl(String sellerID, String itemID) {
-    final path = "$sellerID/$itemID.jpg";
+  static String fetchImageUrl(String sellerId, String itemId) {
+    final path = "$sellerId/$itemId.jpg";
     return supabase.storage.from("catalog-images").getPublicUrl(path);
   }
 
@@ -129,9 +129,9 @@ class CatalogHandler {
   }
 
 
-  static Future<Item> fetchItem(String itemID) async {
+  static Future<Item> fetchItem(String itemId) async {
     // do not call db if item is already cached
-    final Item? itemInCache = CacheHandler.findItemInCache(itemID);
+    final Item? itemInCache = CacheHandler.findItemInCache(itemId);
 
     if (itemInCache != null) return itemInCache;
 
@@ -139,12 +139,12 @@ class CatalogHandler {
     final List<Map<String, dynamic>> response = await supabase
       .from("catalog")
       .select("*, user_profiles(*)")
-      .eq("id", itemID);
+      .eq("id", itemId);
 
     final Map<String, dynamic>? row = response.firstOrNull;
 
     if (row == null) {
-      throw Exception("Item not found: $itemID");
+      throw Exception("Item not found: $itemId");
     }
 
     final item = Item.fromMapToItem(row);

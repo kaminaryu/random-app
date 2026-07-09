@@ -11,7 +11,7 @@ class Item {
     this.rating = 0.0,
     this.amountSold = 0,
     required this.createdAt,
-    required this.sellerID,
+    required this.sellerId,
     required this.sellerName,
   });
 
@@ -26,11 +26,11 @@ class Item {
   final double rating;
   final int    amountSold;
   final DateTime createdAt;
-  final String sellerID;
+  final String sellerId;
   final String sellerName;
 
   // refer to factory below
-  static const String deletedID = "Deleted";
+  static const String deletedId = "Deleted";
 
 
   factory Item.fromMapToItem(Map<String, dynamic> row) {
@@ -45,7 +45,7 @@ class Item {
       rating:     row["rating"],
       amountSold: row["amount_sold"],
       createdAt:  DateTime.parse(row["item_created_at"]),
-      sellerID:   row["user_id"],
+      sellerId:   row["user_id"],
       sellerName: row["user_profiles"]?["user_name"] ?? row["user_name"] ?? "Unknown User",
     );
   }
@@ -64,7 +64,7 @@ class Item {
       rating:     catalog["rating"],
       amountSold: catalog["amount_sold"],
       createdAt:  DateTime.parse(catalog["item_created_at"]),
-      sellerID:   catalog["user_id"],
+      sellerId:   catalog["user_id"],
       sellerName: catalog["user_profiles"]?["user_name"] ?? "Unknown User",
     );
   }
@@ -72,7 +72,7 @@ class Item {
   // for editing listings screen, after deleting the item from db, return this object to indicate item has been delete and not edited
   factory Item.deleted() {
     return Item(
-      id:         deletedID,
+      id:         deletedId,
       name:       "Deleted Item",
       price:      0,
       desc:       "",
@@ -80,7 +80,7 @@ class Item {
       shortDesc:  "",
       isPublic:   false,
       createdAt:  DateTime.now(),
-      sellerID:   "",
+      sellerId:   "",
       sellerName: "",
     );
   }
@@ -98,7 +98,7 @@ class Item {
       "rating": rating,
       "amount_sold": amountSold,
       "item_created_at": createdAt.toIso8601String(),
-      "user_id": sellerID,
+      "user_id": sellerId,
       "user_name": sellerName,
     };
   }

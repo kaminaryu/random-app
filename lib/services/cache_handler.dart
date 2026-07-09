@@ -13,19 +13,19 @@ class CacheHandler {
   // -- Caching Items -- //
   /////////////////////////
 
-  static Item? findItemInCache(String itemID) {
-    if (!_items.containsKey(itemID)) {
+  static Item? findItemInCache(String itemId) {
+    if (!_items.containsKey(itemId)) {
       debugPrint("## Cache Handler: Requested item is not cached");
       return null;
     }
 
-    final Map<String, dynamic> item = _items[itemID]!;
+    final Map<String, dynamic> item = _items[itemId]!;
 
     // if item has been cached a while ago, refresh
     final Duration cacheDuration = DateTime.now().difference(item["cacheTime"]);
     if (cacheDuration.inMinutes >= 5) {
       debugPrint("## Cache Handler: Cached item is stale, fetching new");
-      removeItemFromCache(itemID);
+      removeItemFromCache(itemId);
       return null;
     }
 
@@ -44,8 +44,8 @@ class CacheHandler {
     };
   }
 
-  static void removeItemFromCache(String itemID) {
-    _items.remove(itemID);
+  static void removeItemFromCache(String itemId) {
+    _items.remove(itemId);
   }
 
 
@@ -57,7 +57,7 @@ class CacheHandler {
   // -> query key => 'sort|filter|page|searchQuery'
   // Filter Naming Scheme:
   //  (i need to make a better system than ts lmao)
-  //  UserID($userID)
+  //  UserId($userId)
   //  PriceRange($start,$end)
   static String generateQuerykey({required SortingOptions sortingOption, String filter="", required int page, String query=""}) {
     return "$sortingOption|$filter|$page|$query";

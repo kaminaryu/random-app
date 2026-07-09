@@ -9,7 +9,7 @@ class CartHandler {
 
 
   static Future<void> addItemToCart({
-    required String itemID,
+    required String itemId,
     required int quantity
   })
   async {
@@ -22,16 +22,16 @@ class CartHandler {
 
     // basically check if user add more amount when they already have the shit in the cart yk, ik you have done this before
     try {
-      final int existingCartItemQuantity = await _checkForExistingCartItem(itemID: itemID);
+      final int existingCartItemQuantity = await _checkForExistingCartItem(itemId: itemId);
 
       if (existingCartItemQuantity == -1) {
-        _createNewCartItem(user: user, itemID: itemID, quantity: quantity);
+        _createNewCartItem(user: user, itemId: itemId, quantity: quantity);
       }
       else {
-        _changeCartItemQuantity(itemID: itemID, currentQuantity: existingCartItemQuantity, deltaQuantity: quantity);
+        _changeCartItemQuantity(itemId: itemId, currentQuantity: existingCartItemQuantity, deltaQuantity: quantity);
       }
 
-      ListingHandler.decreaseListingStock(itemID: itemID, amount: quantity);
+      ListingHandler.decreaseListingStock(itemId: itemId, amount: quantity);
 
     }
     catch (e) {
@@ -41,7 +41,7 @@ class CartHandler {
   }
 
 
-  static Future<int> _checkForExistingCartItem({required String itemID}) async {
+  static Future<int> _checkForExistingCartItem({required String itemId}) async {
     final user = supabase.auth.currentUser;
     if (user == null) return -1;
 
@@ -51,7 +51,7 @@ class CartHandler {
       response = await supabase
         .from("user_cart")
         .select("item_quantity")
-        .eq("item_id", itemID)
+        .eq("item_id", itemId)
         .eq("user_id", user.id);
     }
     catch (e) {
@@ -68,7 +68,7 @@ class CartHandler {
 
 
   static Future<void> _changeCartItemQuantity({
-    required String itemID,
+    required String itemId,
     required int currentQuantity,
     required int deltaQuantity,
   }) async {
@@ -80,7 +80,7 @@ class CartHandler {
         .update({
           "item_quantity": newQuantity,
         })
-        .eq("item_id", itemID);
+        .eq("item_id", itemId);
     }
     catch (e) {
       debugPrint("Error when changing cart item quantity: ${e.toString()}");
@@ -91,7 +91,7 @@ class CartHandler {
 
   static Future<void> _createNewCartItem({
     required User user,
-    required String itemID,
+    required String itemId,
     required int quantity,
   }) async {
     try {
@@ -99,7 +99,7 @@ class CartHandler {
         .from("user_cart")
         .insert({
           "user_id": user.id,
-          "item_id": itemID,
+          "item_id": itemId,
           "item_quantity": quantity,
         });
     }
@@ -110,7 +110,7 @@ class CartHandler {
   }
 
 
-  static Future<void> removeItemFromCart({required String itemID}) async {
+  static Future<void> removeItemFromCart({required String itemId}) async {
     final user = supabase.auth.currentUser;
     if (user == null) return;
 
@@ -118,7 +118,7 @@ class CartHandler {
       await supabase
         .from("user_cart")
         .delete()
-        .eq("item_id", itemID)
+        .eq("item_id", itemId)
         .eq("user_id", user.id);
     }
     catch (e) {
@@ -130,7 +130,7 @@ class CartHandler {
 
   static Future<List<Item>> fetchRangedCartItems({
     required int page,
-    required String userID
+    required String userId
   })
   async {
     // 1 based indexing cuz normal people uses ts
@@ -141,7 +141,7 @@ class CartHandler {
       .from("user_cart")
       // join user_cart with INNER_JOIN(catalog, user_profile)
       .select("item_quantity, catalog!inner(*, user_profiles(*))")
-      .eq("user_id", userID)
+      .eq("user_id", userId)
       .range(start, end);
 
     return (response)

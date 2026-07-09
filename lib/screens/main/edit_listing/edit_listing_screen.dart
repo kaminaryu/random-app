@@ -76,7 +76,7 @@ class _EditListingScreenState extends State<EditListingScreen> {
 
     try {
       final Item newItem = await ListingHandler.updateListing(
-        itemID: widget.item.id,
+        itemId: widget.item.id,
         name: _nameController.text.trim(),
         price: double.parse(_priceController.text.trim()),
         desc: _descController.text.trim(),
@@ -87,15 +87,19 @@ class _EditListingScreenState extends State<EditListingScreen> {
       );
 
       if (!mounted) return;
+
       context.pop(newItem);
-    } catch (e) {
+    } 
+    catch (e) {
       if (!mounted) return;
+
       AuthErrorSnackBar.show(
         ScaffoldMessenger.of(context),
         'Failed to edit listing: $e',
         Theme.of(context).colorScheme.error,
       );
-    } finally {
+    } 
+    finally {
       if (mounted) setState(() => _isSubmitting = false);
     }
   }
@@ -131,8 +135,8 @@ class _EditListingScreenState extends State<EditListingScreen> {
                 context.pop(true); /// pop the confirmation box
 
                 ListingHandler.deleteList(
-                  sellerID: widget.item.sellerID,
-                  itemID: widget.item.id
+                  sellerId: widget.item.sellerId,
+                  itemId: widget.item.id
                 );
                 context.pop(Item.deleted());
               },
@@ -226,7 +230,7 @@ class _EditListingScreenState extends State<EditListingScreen> {
     }
 
     return Image.network(
-      CatalogHandler.fetchImageUrl(widget.item.sellerID, widget.item.id),
+      CatalogHandler.fetchImageUrl(widget.item.sellerId, widget.item.id),
       width: 120,
       height: 120,
       fit: BoxFit.contain,

@@ -32,7 +32,7 @@ final router = GoRouter(
       path: "/item",
       builder: (context, state) {
         final id = state.uri.queryParameters["id"]!;
-        return ItemScreen(itemID: id);
+        return ItemScreen(itemId: id);
       }
     ),
 

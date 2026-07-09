@@ -33,7 +33,7 @@ class CartCard extends StatelessWidget {
               width: 96,
               height: 96,
               child: Image.network(
-                CatalogHandler.fetchImageUrl(item.sellerID, item.id),
+                CatalogHandler.fetchImageUrl(item.sellerId, item.id),
                 fit: BoxFit.contain,
                 loadingBuilder: (context, child, progress) {
                   if (progress == null) return child;
@@ -107,7 +107,7 @@ class CartCard extends StatelessWidget {
           ),
           IconButton(
             onPressed: () async {
-              await CartHandler.removeItemFromCart(itemID: item.id);
+              await CartHandler.removeItemFromCart(itemId: item.id);
               onDelete();
             },
             icon: const Icon(Icons.delete, color: Colors.redAccent),

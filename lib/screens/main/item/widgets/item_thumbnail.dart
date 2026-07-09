@@ -35,7 +35,7 @@ class ItemThumbnail extends StatelessWidget {
       child: AspectRatio(
         aspectRatio: 3 / 3,
         child: Image.network(
-          CatalogHandler.fetchImageUrl(item.sellerID, item.id),
+          CatalogHandler.fetchImageUrl(item.sellerId, item.id),
           width: double.infinity,
           fit: BoxFit.contain,
           loadingBuilder: (context, child, progress) {

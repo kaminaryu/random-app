@@ -31,7 +31,7 @@ class _CartScreenState extends State<CartScreen> {
     setState(() => _isLoading = true);
     final items = await CartHandler.fetchRangedCartItems(
       page: _page,
-      userID: user.id,
+      userId: user.id,
     );
     if (!mounted) return;
     setState(() {

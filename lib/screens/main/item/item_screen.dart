@@ -11,8 +11,8 @@ import 'package:i_bazaar/services/catalog_handler.dart';
 import 'package:i_bazaar/widgets/main/main_app_bar.dart';
 
 class ItemScreen extends StatefulWidget {
-  const ItemScreen({super.key, required this.itemID});
-  final String itemID;
+  const ItemScreen({super.key, required this.itemId});
+  final String itemId;
 
   @override
   State<ItemScreen> createState() => _ItemScreenState();
@@ -24,14 +24,14 @@ class _ItemScreenState extends State<ItemScreen> {
   @override
   void initState() {
     super.initState();
-    _itemFuture = CatalogHandler.fetchItem(widget.itemID);
+    _itemFuture = CatalogHandler.fetchItem(widget.itemId);
   }
 
   Future<void> _refresh() async {
     setState(() {
       // remove the cache and refresh the page
-      CacheHandler.removeItemFromCache(widget.itemID);
-      _itemFuture = CatalogHandler.fetchItem(widget.itemID);
+      CacheHandler.removeItemFromCache(widget.itemId);
+      _itemFuture = CatalogHandler.fetchItem(widget.itemId);
     });
 
     // waut til finish refreshing
@@ -86,7 +86,7 @@ class _ItemScreenState extends State<ItemScreen> {
               builder: (dialogContext) => AddToCartDialog(
                 item: item,
                 onConfirm: (amount) {
-                  CartHandler.addItemToCart(itemID: item.id, quantity: amount);
+                  CartHandler.addItemToCart(itemId: item.id, quantity: amount);
                 },
               ),
             ),

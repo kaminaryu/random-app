@@ -40,7 +40,7 @@ class _AddToCartDialogState extends State<AddToCartDialog> {
           borderRadius: BorderRadius.circular(8),
           child: Image.network(
             CatalogHandler.fetchImageUrl(
-              widget.item.sellerID,
+              widget.item.sellerId,
               widget.item.id,
             ),
             fit: BoxFit.cover,

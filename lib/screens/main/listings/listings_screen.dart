@@ -26,22 +26,22 @@ class _ListingsScreenState extends State<ListingsScreen> {
   }
 
   Future<void> _fetchListing() async {
-    final String userID = Supabase.instance.client.auth.currentUser!.id;
+    final String userId = Supabase.instance.client.auth.currentUser!.id;
 
     _futureFunction = CatalogHandler.fetchRangedItems(
       page: _page,
       sortingOption: SortingOptions.uploadDate,
-      userID: userID,
+      userId: userId,
     );
   }
 
   Future<void> _refresh() async {
-    final String userID = Supabase.instance.client.auth.currentUser!.id;
+    final String userId = Supabase.instance.client.auth.currentUser!.id;
 
     // remove query from cache before rebuilding
     final String queryKey = CacheHandler.generateQuerykey(
       sortingOption: SortingOptions.uploadDate,
-      filter: "UserID($userID)",
+      filter: "UserId($userId)",
       page: _page,
     );
     CacheHandler.removeQueryFromCache(queryKey);
@@ -51,7 +51,7 @@ class _ListingsScreenState extends State<ListingsScreen> {
       _futureFunction = CatalogHandler.fetchRangedItems(
         page: _page,
         sortingOption: SortingOptions.uploadDate,
-        userID: userID,
+        userId: userId,
       );
     });
   }

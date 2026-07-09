@@ -41,7 +41,7 @@ class _ListingCardState extends State<ListingCard> {
     }
 
     // this is so dumb BUT IT WORKS LMAOOOOOOOOOOOOOOOOOOOOOOOOOOOO
-    if (newItem.id == Item.deletedID) {
+    if (newItem.id == Item.deletedId) {
       widget.refreshScreen();
     }
 
@@ -74,7 +74,7 @@ class _ListingCardState extends State<ListingCard> {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(ListingCard.thumbnailBorderRadius),
         child: Image.network(
-          CatalogHandler.fetchImageUrl(item.sellerID, item.id),
+          CatalogHandler.fetchImageUrl(item.sellerId, item.id),
           width: ListingCard.thumbnailSize,
           height: ListingCard.thumbnailSize,
           fit: BoxFit.cover,

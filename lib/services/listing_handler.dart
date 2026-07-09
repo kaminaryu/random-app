@@ -22,10 +22,10 @@ class ListingHandler {
   async {
     final user = supabase.auth.currentUser;
 
-    final itemID = const Uuid().v4();
+    final itemId = const Uuid().v4();
 
     final sellerId = user!.id;
-    final imagePath = '$sellerId/$itemID.jpg';
+    final imagePath = '$sellerId/$itemId.jpg';
 
     await supabase.storage.from("catalog-images").upload(
       imagePath,
@@ -39,7 +39,7 @@ class ListingHandler {
       await supabase
         .from("catalog")
         .insert({
-          "id": itemID,
+          "id": itemId,
           "item_name": name,
           "price": roundedPrice,
           "desc": desc,
@@ -63,7 +63,7 @@ class ListingHandler {
 
 
   static Future<Item> updateListing({
-    required String itemID,
+    required String itemId,
     required String name,
     required double price,
     required String desc,
@@ -76,7 +76,7 @@ class ListingHandler {
     final user = supabase.auth.currentUser;
 
     final sellerId = user!.id;
-    final imagePath = '$sellerId/$itemID.jpg';
+    final imagePath = '$sellerId/$itemId.jpg';
 
     if (imageFile != null) {
       await supabase.storage.from("catalog-images").update(
@@ -100,7 +100,7 @@ class ListingHandler {
           "is_public": isPublic,
           "user_id": sellerId,
         })
-        .eq("id", itemID)
+        .eq("id", itemId)
         .select("*, user_profiles(*)");
 
       return (response)
@@ -123,14 +123,14 @@ class ListingHandler {
 
   // using RPC to avoid race cond
   static Future<void> decreaseListingStock({
-    required String itemID,
+    required String itemId,
     required int amount
   })
   async {
     try {
       await supabase
         .rpc("decrease_stock", params: {
-          "item_id": itemID,
+          "item_id": itemId,
           "amount": amount
         });
     }
@@ -141,11 +141,11 @@ class ListingHandler {
   }
 
 
-  static Future<void> deleteList({required String sellerID, required String itemID}) async {
-    await supabase.from("catalog").delete().eq("id", itemID);
+  static Future<void> deleteList({required String sellerId, required String itemId}) async {
+    await supabase.from("catalog").delete().eq("id", itemId);
 
     // delete the thumbnail associated with the item
-    final imagePath = '$sellerID/$itemID.jpg';
+    final imagePath = '$sellerId/$itemId.jpg';
     await supabase.storage.from("catalog-images").remove([imagePath]);
   }
 }
