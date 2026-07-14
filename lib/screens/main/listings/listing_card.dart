@@ -14,7 +14,7 @@ class ListingCard extends StatefulWidget {
   static const double cardHeight       = 128.0;
   static const double cardSpacing      = 12.0;
   static const double cardBorderRadius = 20.0;
-  static const double thumbnailSize         = 96.0;
+  static const double thumbnailSize         = 80.0;
   static const double thumbnailPadding      = 12.0;
   static const double thumbnailBorderRadius = cardBorderRadius - thumbnailPadding;
 
@@ -51,16 +51,7 @@ class _ListingCardState extends State<ListingCard> {
   }
 
 
-  Widget _buildThumnail() {
-    return Stack(
-      children: [
-        _buildThumbnailImage(),
-        _buildVisibilityStatusLabel(),
-      ],
-    );
-  }
-
-  Widget _buildThumbnailImage() {
+  Widget _buildThumbnail() {
     return Container(
       margin: EdgeInsets.all(ListingCard.thumbnailPadding),
       decoration: BoxDecoration(
@@ -83,32 +74,6 @@ class _ListingCardState extends State<ListingCard> {
     );
   }
 
-  Widget _buildVisibilityStatusLabel() {
-    return Positioned(
-      left: 0,
-      right: 0,
-      top: 4,
-      child: Align(
-        alignment: Alignment.topCenter,
-        child: Container(
-          padding: EdgeInsets.symmetric(vertical: 2.0, horizontal: 6.0),
-          decoration: BoxDecoration(
-            color: item.isPublic ? Colors.green : Colors.red,
-            borderRadius: BorderRadius.circular(16.0),
-          ),
-          child: Text(
-            item.isPublic ? "Public" : "Private",
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 10,
-            ),
-          )
-        ),
-      ),
-    );
-  }
-
-
   Widget _buildItemDetails(ColorScheme colorScheme) {
     return Expanded(
       child: Padding(
@@ -117,11 +82,11 @@ class _ListingCardState extends State<ListingCard> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ListingCardItemDetails.nameRatingRow(item, colorScheme),
+            ListingCardItemDetails.nameVisibilityRow(item, colorScheme),
 
             ListingCardItemDetails.shortDesc(item, colorScheme),
 
-            ListingCardItemDetails.priceStockRow(item, colorScheme),
+            ListingCardItemDetails.compactBottomRow(item, colorScheme),
           ],
         ),
       )
@@ -131,7 +96,7 @@ class _ListingCardState extends State<ListingCard> {
 
   Widget _buildEditArea(ColorScheme colorScheme) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 4.0),
+      padding: EdgeInsets.symmetric(horizontal: 8.0),
       margin: EdgeInsets.only(left: ListingCard.thumbnailPadding),
 
       decoration: BoxDecoration(
@@ -178,7 +143,7 @@ class _ListingCardState extends State<ListingCard> {
             mainAxisSize: MainAxisSize.max,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              _buildThumnail(),
+              _buildThumbnail(),
 
               _buildItemDetails(colorScheme),
 

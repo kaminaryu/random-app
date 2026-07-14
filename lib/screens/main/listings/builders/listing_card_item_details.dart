@@ -2,25 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:i_bazaar/models/item.dart';
 
 class ListingCardItemDetails {
-  static Widget nameRatingRow(Item item, ColorScheme colorScheme) {
+  static Widget nameVisibilityRow(Item item, ColorScheme colorScheme) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        _nameStatusSection(item, colorScheme),
-
-        _ratingSection(item, colorScheme),
+        _nameSection(item, colorScheme),
+        _visibilityBadge(item),
       ],
     );
   }
 
-  static Widget _nameStatusSection(Item item, ColorScheme colorScheme) {
+  static Widget _nameSection(Item item, ColorScheme colorScheme) {
     return Expanded(
       child: Text(
         item.name,
         overflow: TextOverflow.ellipsis,
-
         style: TextStyle(
-          fontSize: 18.0,
+          fontSize: 20.0,
           fontWeight: FontWeight.w700,
           color: colorScheme.onPrimary,
         ),
@@ -28,27 +26,22 @@ class ListingCardItemDetails {
     );
   }
 
-  static Widget _ratingSection(Item item, ColorScheme colorScheme) {
-    return Row(
-      spacing: 4.0,
-      children: [
-        Icon(
-          Icons.star,
-          color: Colors.amber,
-          size: 14.0,
+  static Widget _visibilityBadge(Item item) {
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: 2.0, horizontal: 6.0),
+      decoration: BoxDecoration(
+        color: item.isPublic ? Colors.green : Colors.red,
+        borderRadius: BorderRadius.circular(16.0),
+      ),
+      child: Text(
+        item.isPublic ? "Public" : "Private",
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: 12,
         ),
-
-        Text(
-          item.rating.toStringAsFixed(2),
-          style: TextStyle(
-            color: Colors.amber,
-            fontSize: 14.0
-          ),
-        ),
-      ]
+      ),
     );
   }
-
 
   static Widget shortDesc(Item item, ColorScheme colorScheme) {
     return Text(
@@ -57,25 +50,40 @@ class ListingCardItemDetails {
       overflow: TextOverflow.ellipsis,
       style: TextStyle(
         color: colorScheme.onPrimary.withAlpha(167),
-        fontSize: 12.0,
+        fontSize: 14.0,
         fontStyle: FontStyle.italic,
       ),
     );
   }
 
-
-  static Widget priceStockRow(Item item, ColorScheme colorScheme) {
+  static Widget compactBottomRow(Item item, ColorScheme colorScheme) {
     return Column(
       children: [
         _horizontalDivider(),
-
         IntrinsicHeight(
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              _priceStockSection(value: "RM ${item.price.toStringAsFixed(2)}", label: "Price",  colorScheme: colorScheme),
+              _compactSection(
+                icon: Icons.star,
+                value: item.rating.toStringAsFixed(2),
+                label: "Rating",
+                color: Colors.amber,
+              ),
               _verticalDivider(),
-              _priceStockSection(value: "${item.stock}",    label: "Stock",  colorScheme: colorScheme),
+              _compactSection(
+                icon: null,
+                value: "RM ${item.price.toStringAsFixed(2)}",
+                label: "Price",
+                color: Colors.lightGreenAccent,
+              ),
+              _verticalDivider(),
+              _compactSection(
+                icon: Icons.inventory_2,
+                value: "${item.stock}",
+                label: "Stock",
+                color: colorScheme.onPrimary,
+              ),
             ],
           ),
         ),
@@ -83,29 +91,35 @@ class ListingCardItemDetails {
     );
   }
 
-  static Widget _priceStockSection({required String value, required String label, required ColorScheme colorScheme}) {
+  static Widget _compactSection({
+    IconData? icon,
+    required String value,
+    required String label,
+    required Color color,
+  }) {
     return Expanded(
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 8), 
+        padding: EdgeInsets.symmetric(horizontal: 4),
         child: Column(
           children: [
-            Text(
-              value,
-              style: TextStyle(
-                color: colorScheme.onPrimary,
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-
-            Text(
-              label,
-              style: TextStyle(
-                color: colorScheme.onPrimary.withAlpha(200),
-                fontSize: 12,
-                fontWeight: FontWeight.w300,
-              ),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              spacing: 2,
+              children: [
+                if (icon != null) Icon(icon, size: 13, color: color),
+                Flexible(
+                  child: Text(
+                    value,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: color,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
         ),
@@ -116,7 +130,7 @@ class ListingCardItemDetails {
   static Widget _horizontalDivider() {
     return Container(
       height: 1,
-      margin: EdgeInsets.symmetric(vertical: 8.0),
+      margin: EdgeInsets.symmetric(vertical: 6),
       decoration: BoxDecoration(
         color: Colors.white.withAlpha(67),
       ),
@@ -126,7 +140,7 @@ class ListingCardItemDetails {
   static Widget _verticalDivider() {
     return Container(
       width: 1,
-      margin: EdgeInsets.symmetric(horizontal: 4.0),
+      margin: EdgeInsets.symmetric(vertical: 4),
       decoration: BoxDecoration(
         color: Colors.white.withAlpha(67),
       ),
