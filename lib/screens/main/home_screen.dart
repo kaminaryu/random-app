@@ -5,6 +5,7 @@ import 'package:i_bazaar/services/catalog_handler.dart';
 import 'package:i_bazaar/widgets/homepage/hero.dart';
 import 'package:i_bazaar/widgets/homepage/item_card.dart';
 import 'package:i_bazaar/widgets/homepage/section_title.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -72,21 +73,19 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildCatalogGrid(List<Item> items) {
-    return GridView.builder(
-      shrinkWrap: true, // wraps children
-      physics: const NeverScrollableScrollPhysics(), // do not scroll itself
-      padding: EdgeInsets.symmetric(horizontal: 24.0),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 8.0),
+      child: MasonryGridView.count(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
         crossAxisCount: 2,
-        crossAxisSpacing: 16.0,
+        crossAxisSpacing: 8.0,
         mainAxisSpacing: 8.0,
-        childAspectRatio: 9/16,
+        itemCount: items.length,
+        itemBuilder: (itemContext, index) {
+          return ItemCard(items[index]);
+        },
       ),
-
-      itemCount: items.length,
-      itemBuilder: (itemContext, index) {
-        return ItemCard(items[index]);
-      },
     );
   }
 

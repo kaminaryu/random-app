@@ -1,6 +1,7 @@
 // NOTE: the menu bs is the most confusing code ive ever wrote..
 // but it works... i think
 import 'package:flutter/material.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:i_bazaar/models/item.dart';
 import 'package:i_bazaar/services/cache_handler.dart';
 import 'package:i_bazaar/services/catalog_handler.dart';
@@ -343,14 +344,10 @@ class _SearchScreenState extends State<SearchScreen> {
   Widget _buildCatalogGrid(List<Item> items) {
     return RefreshIndicator(
       onRefresh: _refresh,
-      child: GridView.builder(
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          crossAxisSpacing: 16.0,
-          mainAxisSpacing: 8.0,
-          childAspectRatio: 9/16,
-        ),
-
+      child: MasonryGridView.count(
+        crossAxisCount: 2,
+        crossAxisSpacing: 8.0,
+        mainAxisSpacing: 8.0,
         itemCount: items.length,
         itemBuilder: (itemContext, index) {
           return ItemCard(items[index]);
