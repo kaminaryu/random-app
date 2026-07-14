@@ -73,13 +73,13 @@ class ListingCardItemDetails {
               _verticalDivider(),
               _compactSection(
                 icon: null,
-                value: "RM ${item.price.toStringAsFixed(2)}",
+                value: "RM${item.price.toStringAsFixed(2)}",
                 label: "Price",
                 color: Colors.lightGreenAccent,
               ),
               _verticalDivider(),
               _compactSection(
-                icon: Icons.inventory_2,
+                icon: Icons.inventory,
                 value: "${item.stock}",
                 label: "Stock",
                 color: colorScheme.onPrimary,
