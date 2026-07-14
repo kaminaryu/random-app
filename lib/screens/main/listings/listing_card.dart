@@ -40,8 +40,8 @@ class _ListingCardState extends State<ListingCard> {
       return;
     }
 
-    // this is so dumb BUT IT WORKS LMAOOOOOOOOOOOOOOOOOOOOOOOOOOOO
-    if (newItem.id == Item.deletedId) {
+    // refresh the screen if one of the listing is deleted
+    if (newItem.isDeleted) {
       widget.refreshScreen();
     }
 

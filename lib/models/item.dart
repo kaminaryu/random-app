@@ -1,5 +1,5 @@
 class Item {
-  const Item({
+  Item({
     required this.id,
     required this.name, 
     required this.price,
@@ -13,6 +13,7 @@ class Item {
     required this.createdAt,
     required this.sellerId,
     required this.sellerName,
+    this.isDeleted = false,
   });
 
   final String id;
@@ -28,9 +29,7 @@ class Item {
   final DateTime createdAt;
   final String sellerId;
   final String sellerName;
-
-  // refer to factory below
-  static const String deletedId = "Deleted";
+  bool isDeleted;
 
 
   factory Item.fromMapToItem(Map<String, dynamic> row) {
@@ -52,6 +51,7 @@ class Item {
 
   factory Item.fromCartRow(Map<String, dynamic> cartRow) {
     final catalog = cartRow["catalog"] as Map<String, dynamic>;
+
     return Item(
       id:         catalog["id"],
       name:       catalog["item_name"],
@@ -66,22 +66,6 @@ class Item {
       createdAt:  DateTime.parse(catalog["item_created_at"]),
       sellerId:   catalog["user_id"],
       sellerName: catalog["user_profiles"]?["user_name"] ?? "Unknown User",
-    );
-  }
-
-  // for editing listings screen, after deleting the item from db, return this object to indicate item has been delete and not edited
-  factory Item.deleted() {
-    return Item(
-      id:         deletedId,
-      name:       "Deleted Item",
-      price:      0,
-      desc:       "",
-      stock:      0,
-      shortDesc:  "",
-      isPublic:   false,
-      createdAt:  DateTime.now(),
-      sellerId:   "",
-      sellerName: "",
     );
   }
 

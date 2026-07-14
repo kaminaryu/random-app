@@ -141,7 +141,8 @@ class ListingHandler {
   }
 
 
-  static Future<void> deleteList({required String sellerId, required String itemId}) async {
+  // delete the listing from the backend
+  static Future<void> deleteListing({required String sellerId, required String itemId}) async {
     await supabase.from("catalog").delete().eq("id", itemId);
 
     // delete the thumbnail associated with the item

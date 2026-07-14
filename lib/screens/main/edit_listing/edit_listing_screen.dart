@@ -134,11 +134,15 @@ class _EditListingScreenState extends State<EditListingScreen> {
               onPressed: () {
                 context.pop(true); /// pop the confirmation box
 
-                ListingHandler.deleteList(
+                ListingHandler.deleteListing(
                   sellerId: widget.item.sellerId,
                   itemId: widget.item.id
                 );
-                context.pop(Item.deleted());
+
+                // flag the item as deleted
+                widget.item.isDeleted = true;
+
+                context.pop(widget.item);
               },
               child: Text('Confirm'),
             ),
