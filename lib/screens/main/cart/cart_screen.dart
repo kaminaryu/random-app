@@ -65,6 +65,14 @@ class _CartScreenState extends State<CartScreen> {
     return total;
   }
 
+
+  void _changeAmountInCart(Item item, int amountDelta) {
+    setState(() {
+      item.amountInCart += amountDelta;
+    });
+  }
+
+
   Widget _buildCartList() {
     if (_isLoading) {
       return const Center(child: CircularProgressIndicator());
@@ -85,7 +93,8 @@ class _CartScreenState extends State<CartScreen> {
         return CartCard(
           item: item,
           isSelected: _selectedItemIds.contains(item.id),
-          toggleItemSelection: (itemId) => _toggleItemSelection(itemId),
+          toggleItemSelection: (v) => _toggleItemSelection(item.id),
+          changeAmountInCart: (item, amountDelta) => _changeAmountInCart(item, amountDelta),
           onDelete: _fetchCart,
         );
       },

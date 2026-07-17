@@ -23,7 +23,7 @@ class Item {
   final String desc;
   final String shortDesc;
   final int    stock;
-  final int    amountInCart;
+  int    amountInCart;
   final bool   isPublic;
   final double rating;
   final int    raters;

@@ -6,11 +6,12 @@ import 'package:i_bazaar/services/catalog_handler.dart';
 
 
 class CartCard extends StatelessWidget {
-  const CartCard({super.key, required this.item, required this.isSelected, required this.toggleItemSelection, required this.onDelete});
+  const CartCard({super.key, required this.item, required this.isSelected, required this.toggleItemSelection, required this.changeAmountInCart, required this.onDelete});
 
   final Item item;
   final bool isSelected;
   final void Function(String) toggleItemSelection; // could use ValueSetter or ValueChanged; but explicit are easier to understand
+  final void Function(Item, int) changeAmountInCart;
   final VoidCallback onDelete; // ts could be void Function()
 
   static const double cardSpacing      = 12.0;
@@ -50,9 +51,60 @@ class CartCard extends StatelessWidget {
   }
 
 
-  Widget _buildItemDetails(ColorScheme colorScheme) {
-    final grandTotal = item.price * item.amountInCart;
+  Widget _buildPriceRow(ColorScheme colorScheme) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          'RM${item.price.toStringAsFixed(2)}',
+          style: TextStyle(
+            color: Colors.lightGreenAccent,
+            fontWeight: FontWeight.w900,
+            fontSize: 18,
+          ),
+        ),
 
+        Row(
+          spacing: 4.0,
+          children: [
+            IconButton(
+              onPressed: () => changeAmountInCart(item, -1),
+              icon: Icon(Icons.remove),
+              iconSize: 14,
+              padding: EdgeInsets.all(4.0),
+              constraints: BoxConstraints(),
+              style: IconButton.styleFrom(
+                foregroundColor: colorScheme.onPrimary,
+                backgroundColor: colorScheme.tertiary,
+              ),
+            ),
+
+            Text(
+              "${item.amountInCart}",
+              style: TextStyle(
+                color: colorScheme.onPrimary,
+              ),
+            ),
+
+            IconButton(
+              onPressed: () => changeAmountInCart(item, 1),
+              icon: Icon(Icons.add),
+              iconSize: 14,
+              padding: EdgeInsets.all(4.0),
+              constraints: BoxConstraints(),
+              style: IconButton.styleFrom(
+                foregroundColor: colorScheme.onPrimary,
+                backgroundColor: colorScheme.tertiary,
+              ),
+            )
+          ],
+        )
+      ],
+    );
+  }
+
+
+  Widget _buildItemDetails(ColorScheme colorScheme) {
     return Expanded(
       child: Padding(
         padding: EdgeInsets.symmetric(vertical: thumbnailPadding),
@@ -69,17 +121,15 @@ class CartCard extends StatelessWidget {
                 color: colorScheme.onPrimary,
               ),
             ),
-
             const SizedBox(height: 2),
 
             Text(
               '@${item.sellerName}',
               style: TextStyle(
-                color: const Color(0xFFCECBF6),
+                color: colorScheme.onPrimary.withAlpha(167),
                 fontSize: 13,
               ),
             ),
-
             const SizedBox(height: 4),
 
             Text(
@@ -93,16 +143,7 @@ class CartCard extends StatelessWidget {
               ),
             ),
 
-            const Spacer(),
-
-            Text(
-              'RM${grandTotal.toStringAsFixed(2)}',
-              style: TextStyle(
-                color: Colors.lightGreenAccent,
-                fontWeight: FontWeight.w900,
-                fontSize: 18,
-              ),
-            ),
+            _buildPriceRow(colorScheme),
           ],
         ),
       ),
