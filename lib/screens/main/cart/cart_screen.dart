@@ -15,6 +15,7 @@ class CartScreen extends StatefulWidget {
 
 class _CartScreenState extends State<CartScreen> {
   List<Item> _items = [];
+  Set<String> _selectedItemIds = {};
   bool _isLoading = true;
   static const _page = 1;
 
@@ -40,9 +41,25 @@ class _CartScreenState extends State<CartScreen> {
     });
   }
 
+  void _toggleItemSelection(String itemId) {
+    for (final i in _selectedItemIds) {
+     debugPrint(i);
+    }
+    setState(() {
+      if (_selectedItemIds.contains(itemId)) {
+        _selectedItemIds.remove(itemId);
+      }
+      else {
+        _selectedItemIds.add(itemId);
+      }
+    });
+  }
+
   double get _grandTotal {
-    double total = 0;
-    for (final item in _items) {
+    double total = 0.0;
+    Iterable<Item> selectedItems = _items.where((item) => _selectedItemIds.contains(item.id));
+
+    for (final item in selectedItems) {
       total += item.price * item.amountInCart;
     }
     return total;
@@ -64,8 +81,11 @@ class _CartScreenState extends State<CartScreen> {
       ),
       itemCount: _items.length,
       itemBuilder: (context, index) {
+        final Item item = _items[index];
         return CartCard(
-          _items[index],
+          item: item,
+          isSelected: _selectedItemIds.contains(item.id),
+          toggleItemSelection: (itemId) => _toggleItemSelection(itemId),
           onDelete: _fetchCart,
         );
       },

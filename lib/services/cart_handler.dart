@@ -1,5 +1,6 @@
 import 'package:flutter/rendering.dart';
 import 'package:i_bazaar/models/item.dart';
+import 'package:i_bazaar/services/cache_handler.dart';
 import 'package:i_bazaar/services/catalog_handler.dart';
 import 'package:i_bazaar/services/listing_handler.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -20,13 +21,15 @@ class CartHandler {
       return;
     }
 
-    // basically check if user add more amount when they already have the shit in the cart yk, ik you have done this before
+    // when user add to cart, check if the item is already inside the cart
     try {
       final int existingCartItemQuantity = await _checkForExistingCartItem(itemId: itemId);
 
-      if (existingCartItemQuantity == -1) {
+      // no item is in cart, create new instance
+      if (existingCartItemQuantity == 0) {
         _createNewCartItem(user: user, itemId: itemId, quantity: quantity);
       }
+      // increase existing item in cart
       else {
         _changeCartItemQuantity(itemId: itemId, currentQuantity: existingCartItemQuantity, deltaQuantity: quantity);
       }
@@ -43,13 +46,13 @@ class CartHandler {
 
   static Future<int> _checkForExistingCartItem({required String itemId}) async {
     final user = supabase.auth.currentUser;
-    if (user == null) return -1;
+    if (user == null) return 0;
 
     final  List<Map<String, dynamic>> response;
 
     try {
       response = await supabase
-        .from("user_cart")
+        .from("user_cart_item")
         .select("item_quantity")
         .eq("item_id", itemId)
         .eq("user_id", user.id);
@@ -60,7 +63,7 @@ class CartHandler {
     }
 
     if (response.isEmpty) {
-      return -1;
+      return 0;
     }
     
     return response.first["item_quantity"];
@@ -76,7 +79,7 @@ class CartHandler {
 
     try {
       await supabase
-        .from("user_cart")
+        .from("user_cart_item")
         .update({
           "item_quantity": newQuantity,
         })
@@ -96,7 +99,7 @@ class CartHandler {
   }) async {
     try {
       await supabase
-        .from("user_cart")
+        .from("user_cart_item")
         .insert({
           "user_id": user.id,
           "item_id": itemId,
@@ -116,13 +119,13 @@ class CartHandler {
 
     try {
       await supabase
-        .from("user_cart")
+        .from("user_cart_item")
         .delete()
         .eq("item_id", itemId)
         .eq("user_id", user.id);
     }
     catch (e) {
-      debugPrint("Error when adding to cart: ${e.toString()}");
+      debugPrint("Error when removing from cart: ${e.toString()}");
       rethrow;
     }
   }
@@ -133,20 +136,31 @@ class CartHandler {
     required String userId
   })
   async {
+    // check item in cache
+    List<Item>? cachedCartItems = CacheHandler.findCartItemsInCache(userId);
+
+    if (cachedCartItems != null) return cachedCartItems;
+
+
     // 1 based indexing cuz normal people uses ts
     final start = (page - 1) * CatalogHandler.pageSize;
     final end   = start + (CatalogHandler.pageSize - 1);
 
     final List<Map<String, dynamic>> response = await supabase
-      .from("user_cart")
-      // join user_cart with INNER_JOIN(catalog, user_profile)
+      .from("user_cart_item")
+      // join user_cart_item with INNER_JOIN(catalog, user_profile)
       .select("item_quantity, catalog!inner(*, user_profiles(*))")
       .eq("user_id", userId)
       .range(start, end);
+    
 
-    return (response)
+    final cartItems = (response)
       .map((row) => Item.fromCartRow(row))
       .toList();
+
+    CacheHandler.addCartItemsToCache(userId, cartItems);
+
+    return cartItems;
   }
 
 }

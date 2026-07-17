@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:i_bazaar/models/item.dart';
 import 'package:i_bazaar/screens/main/item/widgets/add_to_cart_button.dart';
-import 'package:i_bazaar/screens/main/item/widgets/add_to_cart_dialog.dart';
 import 'package:i_bazaar/screens/main/item/widgets/item_details.dart';
 import 'package:i_bazaar/screens/main/item/widgets/item_metadata_label.dart';
 import 'package:i_bazaar/screens/main/item/widgets/item_thumbnail.dart';
 import 'package:i_bazaar/services/cache_handler.dart';
-import 'package:i_bazaar/services/cart_handler.dart';
 import 'package:i_bazaar/services/catalog_handler.dart';
 import 'package:i_bazaar/widgets/main/main_app_bar.dart';
 
@@ -81,15 +79,8 @@ class _ItemScreenState extends State<ItemScreen> {
           ),
           floatingActionButton: AddToCartButton(
             price: item.price,
-            onPressed: () => showDialog(
-              context: context,
-              builder: (dialogContext) => AddToCartDialog(
-                item: item,
-                onConfirm: (amount) {
-                  CartHandler.addItemToCart(itemId: item.id, quantity: amount);
-                },
-              ),
-            ),
+            item: item,
+
           ),
           floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
         );

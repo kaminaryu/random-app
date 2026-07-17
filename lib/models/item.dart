@@ -9,6 +9,7 @@ class Item {
     this.amountInCart = 0,
     required this.isPublic,
     this.rating = 0.0,
+    this.raters = 0,
     this.amountSold = 0,
     required this.createdAt,
     required this.sellerId,
@@ -25,6 +26,7 @@ class Item {
   final int    amountInCart;
   final bool   isPublic;
   final double rating;
+  final int    raters;
   final int    amountSold;
   final DateTime createdAt;
   final String sellerId;
@@ -42,6 +44,7 @@ class Item {
       stock:      row["stock"],
       isPublic:   row["is_public"],
       rating:     row["rating"],
+      raters:     row["raters"],
       amountSold: row["amount_sold"],
       createdAt:  DateTime.parse(row["item_created_at"]),
       sellerId:   row["user_id"],
@@ -49,6 +52,7 @@ class Item {
     );
   }
 
+  // for converting cart row to Item when displaying cart lists
   factory Item.fromCartRow(Map<String, dynamic> cartRow) {
     final catalog = cartRow["catalog"] as Map<String, dynamic>;
 
@@ -62,6 +66,7 @@ class Item {
       amountInCart: cartRow["item_quantity"] as int,
       isPublic:   catalog["is_public"],
       rating:     catalog["rating"],
+      raters:     catalog["raters"],
       amountSold: catalog["amount_sold"],
       createdAt:  DateTime.parse(catalog["item_created_at"]),
       sellerId:   catalog["user_id"],

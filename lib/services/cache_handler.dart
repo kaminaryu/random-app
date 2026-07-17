@@ -9,6 +9,10 @@ class CacheHandler {
   // dynamic: {"cacheTime": DateTime, "items": List<Item>}
   static Map<String, Map<String, dynamic>> _itemQueries = {};
 
+  // dynamic: {"cacheTime": DateTime, "items": List<Item>}
+  static Map<String, Map<String, dynamic>> _cartItems = {};
+
+
   /////////////////////////
   // -- Caching Items -- //
   /////////////////////////
@@ -96,7 +100,51 @@ class CacheHandler {
   }
 
 
+  // usually for refreshing
   static void removeQueryFromCache(String queryKey) {
     _itemQueries.remove(queryKey);
+  }
+
+
+  //////////////////////////////
+  // -- Caching Cart Items -- //
+  //////////////////////////////
+  static List<Item>? findCartItemsInCache(String userId) {
+    if (!_cartItems.containsKey(userId)) {
+      debugPrint("## Cache Handler: Requested cart items is not cached");
+      debugPrint("User ID: $userId");
+      return null;
+    }
+
+    final Map<String, dynamic> query = _cartItems[userId]!;
+
+    // if query has been cached a while ago, refresh
+    final Duration cacheDuration = DateTime.now().difference(query["cacheTime"]);
+    if (cacheDuration.inMinutes >= 5) {
+      debugPrint("## Cache Handler: Cached query is stale, fetching new query");
+      removeQueryFromCache(userId);
+
+      return null;
+    }
+
+    debugPrint("## Cache Handler: Returning cart items from cache");
+    return query['items'];
+  }
+
+
+  static void addCartItemsToCache(String userId, List<Item> items) {
+    debugPrint("## Cache Handler: Adding query to cache");
+    debugPrint("User ID: $userId");
+
+    _cartItems[userId] = {
+      "cacheTime": DateTime.now(),
+      "items": items,
+    };
+  }
+
+
+  // usually for refreshing
+  static void removeCartItemsFromCache(String userId) {
+    _itemQueries.remove(userId);
   }
 }

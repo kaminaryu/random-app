@@ -1,119 +1,176 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:i_bazaar/models/item.dart';
 import 'package:i_bazaar/services/cart_handler.dart';
 import 'package:i_bazaar/services/catalog_handler.dart';
 
+
 class CartCard extends StatelessWidget {
-  const CartCard(this.item, {super.key, required this.onDelete});
+  const CartCard({super.key, required this.item, required this.isSelected, required this.toggleItemSelection, required this.onDelete});
 
   final Item item;
-  final VoidCallback onDelete;
+  final bool isSelected;
+  final void Function(String) toggleItemSelection; // could use ValueSetter or ValueChanged; but explicit are easier to understand
+  final VoidCallback onDelete; // ts could be void Function()
 
-  static double get cardHeight => 128;
+  static const double cardSpacing      = 12.0;
+  static const double cardBorderRadius = 20.0;
+  static const double thumbnailSize         = 80.0;
+  static const double thumbnailPadding      = 12.0;
+  static const double thumbnailBorderRadius = cardBorderRadius - thumbnailPadding; // this code made it so that the other const needs to be const instead of final
+
+
+  Widget _buildCheckBox() {
+    return Checkbox(
+      value: isSelected,
+      onChanged: (bool? newValue) => toggleItemSelection(item.id),
+    );
+  }
+
+  Widget _buildThumbnail() {
+    return Align(
+      alignment: Alignment.topLeft,
+      child: Container(
+        margin: EdgeInsets.only(top: thumbnailPadding, right: thumbnailPadding),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(thumbnailBorderRadius),
+        ),
+
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(thumbnailBorderRadius),
+          child: Image.network(
+            CatalogHandler.fetchImageUrl(item.sellerId, item.id),
+            width: thumbnailSize,
+            height: thumbnailSize,
+            fit: BoxFit.cover,
+          ),
+        ),
+      ),
+    );
+  }
+
+
+  Widget _buildItemDetails(ColorScheme colorScheme) {
+    final grandTotal = item.price * item.amountInCart;
+
+    return Expanded(
+      child: Padding(
+        padding: EdgeInsets.symmetric(vertical: thumbnailPadding),
+
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              item.name,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 20.0,
+                fontWeight: FontWeight.w700,
+                color: colorScheme.onPrimary,
+              ),
+            ),
+
+            const SizedBox(height: 2),
+
+            Text(
+              '@${item.sellerName}',
+              style: TextStyle(
+                color: const Color(0xFFCECBF6),
+                fontSize: 13,
+              ),
+            ),
+
+            const SizedBox(height: 4),
+
+            Text(
+              " ${item.shortDesc}",
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: colorScheme.onPrimary.withAlpha(167),
+                fontSize: 14.0,
+                fontStyle: FontStyle.italic,
+              ),
+            ),
+
+            const Spacer(),
+
+            Text(
+              'RM${grandTotal.toStringAsFixed(2)}',
+              style: TextStyle(
+                color: Colors.lightGreenAccent,
+                fontWeight: FontWeight.w900,
+                fontSize: 18,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+
+  Widget _buildDeleteArea(ColorScheme colorScheme) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 8.0),
+      margin: EdgeInsets.only(left: thumbnailPadding),
+
+      decoration: BoxDecoration(
+        color: Color(0xFF583a6f),
+        border: Border(
+          left: BorderSide(
+            color: Colors.black12,
+            width: 2.0,
+          ),
+        ),
+      ),
+
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () async {
+          await CartHandler.removeItemFromCart(itemId: item.id);
+          onDelete();
+        },
+        child: Icon(
+          Icons.delete,
+          color: Colors.redAccent,
+        ),
+      ),
+    );
+  }
+
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final grandTotal = item.price * item.amountInCart;
+    final colorScheme = Theme.of(context).colorScheme;
 
-    return Container(
-      height: cardHeight,
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.primary,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      padding: const EdgeInsets.all(12),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: SizedBox(
-              width: 96,
-              height: 96,
-              child: Image.network(
-                CatalogHandler.fetchImageUrl(item.sellerId, item.id),
-                fit: BoxFit.contain,
-                loadingBuilder: (context, child, progress) {
-                  if (progress == null) return child;
-                  return const Center(child: CircularProgressIndicator());
-                },
-                errorBuilder: (context, error, stackTrace) {
-                  return const Icon(Icons.broken_image);
-                },
-              ),
-            ),
+    return GestureDetector(
+      onTap: () => context.push("/item/?id=${item.id}"),
+
+      child: Container(
+        clipBehavior: Clip.antiAlias,
+        decoration: BoxDecoration(
+          color: colorScheme.primary,
+          borderRadius: BorderRadius.circular(cardBorderRadius),
+        ),
+
+        margin: EdgeInsets.only(bottom: cardSpacing),
+
+        child: IntrinsicHeight(
+          child: Row(
+            mainAxisSize: MainAxisSize.max,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _buildCheckBox(),
+
+              _buildThumbnail(),
+
+              _buildItemDetails(colorScheme),
+
+              _buildDeleteArea(colorScheme),
+            ],
           ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: SizedBox(
-              height: 96,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        item.name,
-                        style: theme.textTheme.titleSmall?.copyWith(
-                          color: Colors.white,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        '@${item.sellerName}',
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: const Color(0xFFCECBF6),
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        item.shortDesc,
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: Colors.white70,
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      Text(
-                        'RM${grandTotal.toStringAsFixed(2)}',
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          color: Colors.green,
-                          fontWeight: FontWeight.w900,
-                          fontSize: 18,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        '(RM${item.price.toStringAsFixed(2)} × ${item.amountInCart})',
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: Colors.white.withAlpha(200),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-          IconButton(
-            onPressed: () async {
-              await CartHandler.removeItemFromCart(itemId: item.id);
-              onDelete();
-            },
-            icon: const Icon(Icons.delete, color: Colors.redAccent),
-            tooltip: "Remove from cart",
-          ),
-        ],
+        ),
       ),
     );
   }
