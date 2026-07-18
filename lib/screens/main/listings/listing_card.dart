@@ -55,10 +55,6 @@ class _ListingCardState extends State<ListingCard> {
     return Container(
       margin: EdgeInsets.all(ListingCard.thumbnailPadding),
       decoration: BoxDecoration(
-        border: Border.all(
-          color: Colors.black38,
-          width: 1,
-        ),
         borderRadius: BorderRadius.circular(ListingCard.thumbnailBorderRadius),
       ),
 
