@@ -82,8 +82,15 @@ class _CartScreenState extends State<CartScreen> {
     if (user == null) return;
 
     setState(() {
+      // get the cart item via ID
       final CartItem cartItem = _cart.where((cartItem) => cartItem.itemId == item.id).first;
       cartItem.amount += amountDelta;
+      if (cartItem.amount < 1) {
+        cartItem.amount = 1;
+      }
+      else if (cartItem.amount > item.stock) {
+        
+      }
     });
 
     await CartHandler.saveToStorage();

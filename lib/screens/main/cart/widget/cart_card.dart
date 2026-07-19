@@ -76,15 +76,19 @@ class CartCard extends StatelessWidget {
         Row(
           spacing: 4.0,
           children: [
-            IconButton(
-              onPressed: () => changeAmountInCart(item, -1),
-              icon: Icon(Icons.remove),
-              iconSize: 14,
-              padding: EdgeInsets.all(4.0),
-              constraints: BoxConstraints(),
-              style: IconButton.styleFrom(
-                foregroundColor: colorScheme.onPrimary,
-                backgroundColor: colorScheme.tertiary,
+            GestureDetector(
+              // block click if the buttton is disabled
+              onTap: () {},
+              child: IconButton(
+                onPressed: (amount > 1) ? () => changeAmountInCart(item, -1) : null,
+                icon: Icon(Icons.remove),
+                iconSize: 14,
+                padding: EdgeInsets.all(4.0),
+                constraints: BoxConstraints(),
+                style: IconButton.styleFrom(
+                  foregroundColor: colorScheme.onPrimary,
+                  backgroundColor: colorScheme.tertiary,
+                ),
               ),
             ),
 
@@ -95,17 +99,21 @@ class CartCard extends StatelessWidget {
               ),
             ),
 
-            IconButton(
-              onPressed: () => changeAmountInCart(item, 1),
-              icon: Icon(Icons.add),
-              iconSize: 14,
-              padding: EdgeInsets.all(4.0),
-              constraints: BoxConstraints(),
-              style: IconButton.styleFrom(
-                foregroundColor: colorScheme.onPrimary,
-                backgroundColor: colorScheme.tertiary,
-              ),
-            )
+            GestureDetector(
+              // block click if the buttton is disabled
+              onTap: () {},
+              child: IconButton(
+                onPressed: (amount < item.stock) ? () => changeAmountInCart(item, 1) : null,
+                icon: Icon(Icons.add),
+                iconSize: 14,
+                padding: EdgeInsets.all(4.0),
+                constraints: BoxConstraints(),
+                style: IconButton.styleFrom(
+                  foregroundColor: colorScheme.onPrimary,
+                  backgroundColor: colorScheme.tertiary,
+                ),
+              )
+          )
           ],
         )
       ],
