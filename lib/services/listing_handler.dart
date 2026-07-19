@@ -104,7 +104,7 @@ class ListingHandler {
         .select("*, user_profiles(*)");
 
       return (response)
-        .map((row) => Item.fromMapToItem(row))
+        .map((row) => Item.fromMap(row))
         .toList()
         .first;
 

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:i_bazaar/app_scroll_behavior.dart';
 import 'package:i_bazaar/routers/router.dart';
+import 'package:i_bazaar/services/cart_handler.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 void main() async {
@@ -15,6 +16,9 @@ void main() async {
     publishableKey: dotenv.env["SUPABASE_PUBLISHABLE_KEY"],
   );
 
+  // init the cart
+  CartHandler.initCart();
+
   runApp(const MyApp());
 }
 
@@ -27,7 +31,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
+      title: 'i-bazaar',
       scrollBehavior: AppScrollBehavior(), // so that we can mouse-drag on linux/web
 
       theme: ThemeData(

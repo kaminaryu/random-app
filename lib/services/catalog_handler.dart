@@ -68,7 +68,7 @@ class CatalogHandler {
 
     // covert postgres rows to items
     final queryList = response
-      .map((row) => Item.fromMapToItem(row))
+      .map((row) => Item.fromMap(row))
       .toList();
 
     CacheHandler.addQueryToCache(queryKey, queryList);
@@ -120,7 +120,7 @@ class CatalogHandler {
     );
 
     final queryList = response
-      .map((row) => Item.fromMapToItem(row))
+      .map((row) => Item.fromMap(row))
       .toList();
 
     CacheHandler.addQueryToCache(queryKey, queryList);
@@ -144,14 +144,31 @@ class CatalogHandler {
     final Map<String, dynamic>? row = response.firstOrNull;
 
     if (row == null) {
+      // change this to not raise exp
       throw Exception("Item not found: $itemId");
     }
 
-    final item = Item.fromMapToItem(row);
+    final item = Item.fromMap(row);
 
     // cache the item
     CacheHandler.addItemToCache(item);
 
     return item;
+  }
+
+
+  // for cart
+  static Future<List<Item>> fetchItemsByIds(List<String> itemIds) async {
+
+    // CacheHandler.findCartItemsInCache(itemIds)
+
+    final response = await Supabase.instance.client
+      .from('catalog')
+      .select("*, user_profiles(*)")
+      .inFilter('id', itemIds);
+
+    return response
+      .map((map) => Item.fromMap(map))
+      .toList();
   }
 }

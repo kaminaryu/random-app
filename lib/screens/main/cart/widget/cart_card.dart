@@ -6,9 +6,18 @@ import 'package:i_bazaar/services/catalog_handler.dart';
 
 
 class CartCard extends StatelessWidget {
-  const CartCard({super.key, required this.item, required this.isSelected, required this.toggleItemSelection, required this.changeAmountInCart, required this.onDelete});
+  const CartCard({
+    super.key, 
+    required this.item,
+    required this.amount,
+    required this.isSelected,
+    required this.toggleItemSelection,
+    required this.changeAmountInCart,
+    required this.onDelete
+  });
 
   final Item item;
+  final int amount;
   final bool isSelected;
   final void Function(String) toggleItemSelection; // could use ValueSetter or ValueChanged; but explicit are easier to understand
   final void Function(Item, int) changeAmountInCart;
@@ -80,7 +89,7 @@ class CartCard extends StatelessWidget {
             ),
 
             Text(
-              "${item.amountInCart}",
+              "$amount",
               style: TextStyle(
                 color: colorScheme.onPrimary,
               ),
@@ -169,7 +178,7 @@ class CartCard extends StatelessWidget {
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: () async {
-          await CartHandler.removeItemFromCart(itemId: item.id);
+          // await CartHandler.removeItemFromCart(itemId: item.id);
           onDelete();
         },
         child: Icon(

@@ -17,6 +17,8 @@ class AddToCartButton extends StatelessWidget {
   final Item item;
 
   Widget _buildAddToCartButton(ThemeData theme, BuildContext context, User user) {
+    CartHandler cartHandler = CartHandler(user.id);
+
     return SizedBox(
       width: double.infinity,
       height: 64,
@@ -28,9 +30,9 @@ class AddToCartButton extends StatelessWidget {
             context: context,
             builder: (dialogContext) => AddToCartDialog(
               item: item,
-              onConfirm: (amount) {
+              onConfirm: (amount) async {
                 CacheHandler.removeCartItemsFromCache(user.id);
-                CartHandler.addItemToCart(itemId: item.id, quantity: amount);
+                await cartHandler.addItemToCart(item.id, amount);
               },
             ),
           ),

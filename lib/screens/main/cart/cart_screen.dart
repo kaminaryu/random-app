@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:i_bazaar/models/cart_item.dart';
 import 'package:i_bazaar/models/item.dart';
 import 'package:i_bazaar/screens/main/cart/widget/cart_card.dart';
 import 'package:i_bazaar/services/cart_handler.dart';
+import 'package:i_bazaar/services/catalog_handler.dart';
 import 'package:i_bazaar/widgets/main/main_app_bar.dart';
 import 'package:i_bazaar/widgets/not_signed_in_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -14,6 +16,7 @@ class CartScreen extends StatefulWidget {
 }
 
 class _CartScreenState extends State<CartScreen> {
+  List<CartItem> _cart = [];
   List<Item> _items = [];
   Set<String> _selectedItemIds = {};
   bool _isLoading = true;
@@ -29,22 +32,29 @@ class _CartScreenState extends State<CartScreen> {
     final user = Supabase.instance.client.auth.currentUser;
     if (user == null) return;
 
+    final CartHandler cartHandler = CartHandler(user.id);
+    final List<CartItem> cart = await cartHandler.fetchCart();
+    final List<String> itemIds = cart.map((cartItem) => cartItem.itemId).toList();
+
     setState(() => _isLoading = true);
-    final items = await CartHandler.fetchRangedCartItems(
-      page: _page,
-      userId: user.id,
-    );
+
+    List<Item> items = await CatalogHandler.fetchItemsByIds(itemIds);
+
     if (!mounted) return;
+
     setState(() {
       _items = items;
+      _cart = cart;
       _isLoading = false;
     });
   }
 
   void _toggleItemSelection(String itemId) {
+    debugPrint("selected IDs:");
     for (final i in _selectedItemIds) {
-     debugPrint(i);
+      debugPrint(i);
     }
+
     setState(() {
       if (_selectedItemIds.contains(itemId)) {
         _selectedItemIds.remove(itemId);
@@ -57,19 +67,26 @@ class _CartScreenState extends State<CartScreen> {
 
   double get _grandTotal {
     double total = 0.0;
-    Iterable<Item> selectedItems = _items.where((item) => _selectedItemIds.contains(item.id));
+    List<Item> selectedItems = _items.where((item) => _selectedItemIds.contains(item.id)).toList();
 
     for (final item in selectedItems) {
-      total += item.price * item.amountInCart;
+      final CartItem cartItem = _cart.where((cartItem) => cartItem.itemId == item.id).first;
+      total += item.price * cartItem.amount;
     }
     return total;
   }
 
 
-  void _changeAmountInCart(Item item, int amountDelta) {
+  Future<void> _changeAmountInCart(Item item, int amountDelta) async {
+    final user = Supabase.instance.client.auth.currentUser;
+    if (user == null) return;
+
     setState(() {
-      item.amountInCart += amountDelta;
+      final CartItem cartItem = _cart.where((cartItem) => cartItem.itemId == item.id).first;
+      cartItem.amount += amountDelta;
     });
+
+    await CartHandler.saveToStorage();
   }
 
 
@@ -90,8 +107,11 @@ class _CartScreenState extends State<CartScreen> {
       itemCount: _items.length,
       itemBuilder: (context, index) {
         final Item item = _items[index];
+        final CartItem cartItem = _cart.where((cartItem) => cartItem.itemId == item.id).first;
+
         return CartCard(
           item: item,
+          amount: cartItem.amount,
           isSelected: _selectedItemIds.contains(item.id),
           toggleItemSelection: (v) => _toggleItemSelection(item.id),
           changeAmountInCart: (item, amountDelta) => _changeAmountInCart(item, amountDelta),

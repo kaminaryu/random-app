@@ -6,7 +6,6 @@ class Item {
     required this.desc,
     required this.shortDesc,
     required this.stock,
-    this.amountInCart = 0,
     required this.isPublic,
     this.rating = 0.0,
     this.raters = 0,
@@ -23,7 +22,6 @@ class Item {
   final String desc;
   final String shortDesc;
   final int    stock;
-  int    amountInCart;
   final bool   isPublic;
   final double rating;
   final int    raters;
@@ -34,7 +32,7 @@ class Item {
   bool isDeleted;
 
 
-  factory Item.fromMapToItem(Map<String, dynamic> row) {
+  factory Item.fromMap(Map<String, dynamic> row) {
     return Item(
       id:         row["id"],
       name:       row["item_name"],
@@ -52,29 +50,7 @@ class Item {
     );
   }
 
-  // for converting cart row to Item when displaying cart lists
-  factory Item.fromCartRow(Map<String, dynamic> cartRow) {
-    final catalog = cartRow["catalog"] as Map<String, dynamic>;
-
-    return Item(
-      id:         catalog["id"],
-      name:       catalog["item_name"],
-      price:      catalog["price"],
-      desc:       catalog["desc"],
-      shortDesc:  catalog["short_desc"],
-      stock:      catalog["stock"],
-      amountInCart: cartRow["item_quantity"] as int,
-      isPublic:   catalog["is_public"],
-      rating:     catalog["rating"],
-      raters:     catalog["raters"],
-      amountSold: catalog["amount_sold"],
-      createdAt:  DateTime.parse(catalog["item_created_at"]),
-      sellerId:   catalog["user_id"],
-      sellerName: catalog["user_profiles"]?["user_name"] ?? "Unknown User",
-    );
-  }
-
-  Map<String, dynamic> fromItemToMap() {
+  Map<String, dynamic> toMap() {
     return {
       "id": id,
       "item_name": name,
@@ -82,7 +58,7 @@ class Item {
       "desc": desc,
       "short_desc": shortDesc,
       "stock": stock,
-      "amountInCart": amountInCart,
+      // "amountInCart": amountInCart,
       "is_public": isPublic,
       "rating": rating,
       "amount_sold": amountSold,

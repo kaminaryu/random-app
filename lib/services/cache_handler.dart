@@ -3,6 +3,7 @@ import 'package:i_bazaar/models/item.dart';
 import 'package:i_bazaar/services/catalog_handler.dart';
 
 class CacheHandler {
+  // NOTE: turn ts into its own class
   // dynamic: {"cacheTime": DateTime, "item": Item}
   static Map<String, Map<String, dynamic>> _items = {};
 
@@ -145,6 +146,6 @@ class CacheHandler {
 
   // usually for refreshing
   static void removeCartItemsFromCache(String userId) {
-    _itemQueries.remove(userId);
+    _cartItems.remove(userId);
   }
 }

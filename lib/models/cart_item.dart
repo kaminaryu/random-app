@@ -1,33 +1,18 @@
-// lib/models/cart_item.dart
-import 'item.dart';
-
 class CartItem {
-  const CartItem({
-    required this.item,
-    required this.quantity,
-  });
+  CartItem(this.itemId, this.amount);
 
-  final Item item;
-  final int quantity;
-
-  CartItem copyWith({int? quantity}) {
-    return CartItem(
-      item: item,
-      quantity: quantity ?? this.quantity,
-    );
-  }
+  final String itemId;
+  int amount = 0;
 
   factory CartItem.fromMap(Map<String, dynamic> map) {
-    return CartItem(
-      item: Item.fromMapToItem(map["item"]),
-      quantity: map["quantity"],
-    );
+    return CartItem(map["itemId"], map["amount"]);
   }
 
   Map<String, dynamic> toMap() {
     return {
-      "item": item.fromItemToMap(),
-      "quantity": quantity,
+      "itemId": itemId,
+      "amount": amount,
     };
   }
 }
+
