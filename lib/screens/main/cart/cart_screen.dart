@@ -17,7 +17,7 @@ class CartScreen extends StatefulWidget {
 
 class _CartScreenState extends State<CartScreen> {
   List<CartItem> _cart = [];
-  List<Item> _items = [];
+  List<Item> _itemsInCart = [];
   Set<String> _selectedItemIds = {};
   bool _isLoading = true;
   static const _page = 1;
@@ -38,12 +38,12 @@ class _CartScreenState extends State<CartScreen> {
 
     setState(() => _isLoading = true);
 
-    List<Item> items = await CatalogHandler.fetchItemsByIds(itemIds);
+    List<Item> itemsInCart = await CatalogHandler.fetchItemsByIds(itemIds);
 
     if (!mounted) return;
 
     setState(() {
-      _items = items;
+      _itemsInCart = itemsInCart;
       _cart = cart;
       _isLoading = false;
     });
@@ -65,15 +65,21 @@ class _CartScreenState extends State<CartScreen> {
     });
   }
 
+
   double get _grandTotal {
     double total = 0.0;
-    List<Item> selectedItems = _items.where((item) => _selectedItemIds.contains(item.id)).toList();
+    List<Item> selectedItems = _itemsInCart.where((item) => _selectedItemIds.contains(item.id)).toList();
 
     for (final item in selectedItems) {
       final CartItem cartItem = _cart.where((cartItem) => cartItem.itemId == item.id).first;
       total += item.price * cartItem.amount;
     }
     return total;
+  }
+
+  int get _totalSelectedItems {
+    List<Item> selectedItems = _itemsInCart.where((item) => _selectedItemIds.contains(item.id)).toList();
+    return selectedItems.length;
   }
 
 
@@ -85,12 +91,6 @@ class _CartScreenState extends State<CartScreen> {
       // get the cart item via ID
       final CartItem cartItem = _cart.where((cartItem) => cartItem.itemId == item.id).first;
       cartItem.amount += amountDelta;
-      if (cartItem.amount < 1) {
-        cartItem.amount = 1;
-      }
-      else if (cartItem.amount > item.stock) {
-        
-      }
     });
 
     await CartHandler.saveToStorage();
@@ -102,7 +102,7 @@ class _CartScreenState extends State<CartScreen> {
       return const Center(child: CircularProgressIndicator());
     }
 
-    if (_items.isEmpty) {
+    if (_itemsInCart.isEmpty) {
       return const Center(child: Text('Your cart is empty'));
     }
 
@@ -111,9 +111,9 @@ class _CartScreenState extends State<CartScreen> {
         top: 8,
         bottom: 64 + MediaQuery.of(context).padding.bottom,
       ),
-      itemCount: _items.length,
+      itemCount: _itemsInCart.length,
       itemBuilder: (context, index) {
-        final Item item = _items[index];
+        final Item item = _itemsInCart[index];
         final CartItem cartItem = _cart.where((cartItem) => cartItem.itemId == item.id).first;
 
         return CartCard(
@@ -129,7 +129,8 @@ class _CartScreenState extends State<CartScreen> {
   }
 
   Widget _buildGrandTotalBar() {
-    if (_items.isEmpty) return const SizedBox.shrink();
+    // hide this bar if theres no items
+    if (_itemsInCart.isEmpty) return const SizedBox.shrink();
 
     final theme = Theme.of(context);
     return Container(
@@ -137,7 +138,7 @@ class _CartScreenState extends State<CartScreen> {
         left: 24,
         right: 24,
         top: 12,
-        bottom: 12 + MediaQuery.of(context).padding.bottom,
+        bottom: 12 + MediaQuery.of(context).padding.bottom, // phone bottom padding
       ),
       decoration: BoxDecoration(
         color: theme.colorScheme.surfaceContainerHighest,
@@ -148,15 +149,41 @@ class _CartScreenState extends State<CartScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            'Total',
-            style: theme.textTheme.titleMedium,
+          // the price total
+          Column(
+            children: [
+              Text(
+                'Total',
+              ),
+              Text(
+                'RM${_grandTotal.toStringAsFixed(2)}',
+                style: TextStyle(
+                  color: Colors.green,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
           ),
-          Text(
-            'RM${_grandTotal.toStringAsFixed(2)}',
-            style: theme.textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w700,
+
+          // the checkout button
+          ElevatedButton(
+            onPressed: (_totalSelectedItems > 0) ? () {} : null,
+            style: ElevatedButton.styleFrom(
+              foregroundColor: theme.colorScheme.onPrimary,
+              backgroundColor: theme.colorScheme.primary,
             ),
+            child: Row(
+              spacing: 8.0,
+              children: [
+                Icon(
+                  Icons.shopping_cart,
+                ),
+
+                Text(
+                  "Checkout",
+                )
+              ],
+            )
           ),
         ],
       ),
