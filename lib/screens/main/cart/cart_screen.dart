@@ -71,8 +71,11 @@ class _CartScreenState extends State<CartScreen> {
     List<Item> selectedItems = _itemsInCart.where((item) => _selectedItemIds.contains(item.id)).toList();
 
     for (final item in selectedItems) {
-      final CartItem cartItem = _cart.where((cartItem) => cartItem.itemId == item.id).first;
-      total += item.price * cartItem.amount;
+      // find the item inside the cart for amount in cart
+      final Iterable<CartItem> cartItem = _cart.where((cartItem) => cartItem.itemId == item.id);
+      if (cartItem.isEmpty) continue; // check if the item is not in cart a.k.a item entry is deleted from cart
+
+      total += item.price * cartItem.first.amount;
     }
     return total;
   }

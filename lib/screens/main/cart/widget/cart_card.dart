@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:i_bazaar/models/item.dart';
 import 'package:i_bazaar/services/cart_handler.dart';
 import 'package:i_bazaar/services/catalog_handler.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 
 class CartCard extends StatelessWidget {
@@ -169,6 +170,9 @@ class CartCard extends StatelessWidget {
 
 
   Widget _buildDeleteArea(ColorScheme colorScheme) {
+    final User? user = Supabase.instance.client.auth.currentUser;
+
+    CartHandler cartHandler = CartHandler(user!.id);
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 8.0),
       margin: EdgeInsets.only(left: thumbnailPadding),
@@ -186,7 +190,7 @@ class CartCard extends StatelessWidget {
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: () async {
-          // await CartHandler.removeItemFromCart(itemId: item.id);
+          await cartHandler.removeItemFromCart(item.id);
           onDelete();
         },
         child: Icon(

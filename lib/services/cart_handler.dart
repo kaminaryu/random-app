@@ -39,12 +39,21 @@ class CartHandler {
 
 
   Future<List<CartItem>> fetchCart() async {
-
     if (!_cartDirectory.containsKey(userId)) {
       return [];
     }
 
     return _cartDirectory[userId]!;
+  }
+
+
+  Future<void> removeItemFromCart(String itemId) async {
+    if (!_cartDirectory.containsKey(userId)) {
+      return;
+    }
+
+    _cartDirectory[userId]!.removeWhere((cartItem) => cartItem.itemId == itemId);
+    saveToStorage();
   }
 
 
