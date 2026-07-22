@@ -72,7 +72,7 @@ class _CartScreenState extends State<CartScreen> {
 
     for (final item in selectedItems) {
       // find the item inside the cart for amount in cart
-      final Iterable<CartItem> cartItem = _cart.where((cartItem) => cartItem.itemId == item.id);
+      final List<CartItem> cartItem = _cart.where((cartItem) => cartItem.itemId == item.id).toList();
       if (cartItem.isEmpty) continue; // check if the item is not in cart a.k.a item entry is deleted from cart
 
       total += item.price * cartItem.first.amount;
@@ -98,7 +98,48 @@ class _CartScreenState extends State<CartScreen> {
 
     await CartHandler.saveToStorage();
   }
+  
 
+  Future<void> _deleteCartItem(String itemId) async {
+    final User? user = Supabase.instance.client.auth.currentUser;
+    if (user == null) throw "User is not signed in";
+
+    final CartHandler cartHandler = CartHandler(user.id);
+    await cartHandler.removeItemFromCart(itemId);
+
+    _fetchCart();
+  }
+
+
+  Future<void> _checkout() async {
+    final SupabaseClient supabase = Supabase.instance.client;
+    List<Item> selectedItems = _itemsInCart.where((item) => _selectedItemIds.contains(item.id)).toList();
+    List<Map<String, dynamic>> checkoutItems = [];
+
+    for (final item in selectedItems) {
+      // find the item inside the cart
+      final List<CartItem> cartItem = _cart.where((cartItem) => cartItem.itemId == item.id).toList();
+      if (cartItem.isEmpty) continue; // check if the item is not in cart a.k.a item entry is deleted from cart
+
+      checkoutItems.add({'id': item.id, 'qty': cartItem.first.amount});
+    }
+
+    try {
+      await supabase.rpc('checkout_cart', params: {'items': checkoutItems});
+
+      for (final item in selectedItems) {
+        _deleteCartItem(item.id);
+      }
+    } on PostgrestException catch (e) {
+
+      debugPrint('Checkout failed: ${e.message}');
+      // NOTE: add proper snackbar here
+    }
+  }
+
+  ////////////////////
+  ///// WIDGETS //////
+  ////////////////////
 
   Widget _buildCartList() {
     if (_isLoading) {
@@ -123,9 +164,9 @@ class _CartScreenState extends State<CartScreen> {
           item: item,
           amount: cartItem.amount,
           isSelected: _selectedItemIds.contains(item.id),
-          toggleItemSelection: (v) => _toggleItemSelection(item.id),
+          toggleItemSelection: () => _toggleItemSelection(item.id),
           changeAmountInCart: (item, amountDelta) => _changeAmountInCart(item, amountDelta),
-          onDelete: _fetchCart,
+          onDelete: () => _deleteCartItem(item.id),
         );
       },
     );
@@ -170,7 +211,7 @@ class _CartScreenState extends State<CartScreen> {
 
           // the checkout button
           ElevatedButton(
-            onPressed: (_totalSelectedItems > 0) ? () {} : null,
+            onPressed: (_totalSelectedItems > 0) ? _checkout : null,
             style: ElevatedButton.styleFrom(
               foregroundColor: theme.colorScheme.onPrimary,
               backgroundColor: theme.colorScheme.primary,

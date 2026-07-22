@@ -20,9 +20,9 @@ class CartCard extends StatelessWidget {
   final Item item;
   final int amount;
   final bool isSelected;
-  final void Function(String) toggleItemSelection; // could use ValueSetter or ValueChanged; but explicit are easier to understand
-  final void Function(Item, int) changeAmountInCart;
-  final VoidCallback onDelete; // ts could be void Function()
+  final VoidCallback toggleItemSelection;
+  final void Function(Item, int) changeAmountInCart; // could use ValueSetter or ValueChanged; but explicit are easier to understand
+  final VoidCallback onDelete;
 
   static const double cardSpacing      = 12.0;
   static const double cardBorderRadius = 20.0;
@@ -34,7 +34,7 @@ class CartCard extends StatelessWidget {
   Widget _buildCheckBox() {
     return Checkbox(
       value: isSelected,
-      onChanged: (bool? newValue) => toggleItemSelection(item.id),
+      onChanged: (bool? newValue) => toggleItemSelection(),
     );
   }
 
@@ -170,9 +170,6 @@ class CartCard extends StatelessWidget {
 
 
   Widget _buildDeleteArea(ColorScheme colorScheme) {
-    final User? user = Supabase.instance.client.auth.currentUser;
-
-    CartHandler cartHandler = CartHandler(user!.id);
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 8.0),
       margin: EdgeInsets.only(left: thumbnailPadding),
@@ -190,7 +187,6 @@ class CartCard extends StatelessWidget {
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: () async {
-          await cartHandler.removeItemFromCart(item.id);
           onDelete();
         },
         child: Icon(
