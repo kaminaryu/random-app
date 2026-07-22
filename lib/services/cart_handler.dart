@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
 import 'package:i_bazaar/models/cart_item.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -12,6 +13,8 @@ class CartHandler {
 
   // userId: [CartItems]
   static Map<String, List<CartItem>> _cartDirectory = {};
+
+  static ValueNotifier<int> totalCartItem = ValueNotifier(0);
 
   
   Future<void> addItemToCart(String itemId, int amount) async {
@@ -26,6 +29,9 @@ class CartHandler {
     if (itemIndex == -1) {
       // create new entry
       userCart.add(CartItem(itemId, amount));
+
+      // updating the cart icon badge on main app bar
+      totalCartItem.value += 1;
     }
     else {
       // increase amount instead
@@ -40,10 +46,14 @@ class CartHandler {
 
   Future<List<CartItem>> fetchCart() async {
     if (!_cartDirectory.containsKey(userId)) {
+      totalCartItem.value = 0;
       return [];
     }
 
-    return _cartDirectory[userId]!;
+    final List<CartItem> userCart = _cartDirectory[userId]!;
+    totalCartItem.value = userCart.length; // updating the cart icon badge on main app bar
+
+    return userCart;
   }
 
 
@@ -52,8 +62,11 @@ class CartHandler {
       return;
     }
 
+    // updating the cart icon badge on main app bar
+    totalCartItem.value -= 1;
+
     _cartDirectory[userId]!.removeWhere((cartItem) => cartItem.itemId == itemId);
-    saveToStorage();
+    await saveToStorage();
   }
 
 

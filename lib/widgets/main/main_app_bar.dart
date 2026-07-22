@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:i_bazaar/services/cart_handler.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 
@@ -10,10 +11,37 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   final String? label;
 
+  Widget _buildCartIcon(BuildContext context, User? user) {
+    return ValueListenableBuilder(
+      valueListenable: CartHandler.totalCartItem,
+      builder: (cartIconContext, value, child) {
+        return Padding(
+          padding: EdgeInsets.only(right: 16.0),
+          child: IconButton(
+            onPressed: () => context.push("/cart"),
+            icon: (value == 0) 
+              ? Icon(Icons.shopping_cart)
+              : Badge.count(
+                  backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+                  textColor: Theme.of(context).colorScheme.onPrimaryContainer,
+                  count: value,
+                  maxCount: 99,
+                  child: Icon(Icons.shopping_cart),
+                ),
+            tooltip: "Cart",
+            color: Theme.of(context).colorScheme.onPrimary,
+          )
+        );
+      }
+    );
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return AppBar(
       backgroundColor: Theme.of(context).colorScheme.primary,
+      foregroundColor: Theme.of(context).colorScheme.onPrimary,
  
       // center
       title: TextButton(
@@ -21,7 +49,7 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
         child: Text(
           label ?? "i-Bazaar",
           style: TextStyle(
-            color: Colors.white,
+            color: Theme.of(context).colorScheme.onPrimary,
             fontSize: 20,
           )
         ),
@@ -35,11 +63,12 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
           builder: (context, snapshot) {
             bool loggedIn = false;
             final String currentURI = GoRouterState.of(context).uri.toString();
+            final User? user = Supabase.instance.client.auth.currentUser;
 
             // check if the user is logged in
             if (snapshot.connectionState == ConnectionState.waiting) {
               // if the user exist == logged in
-              loggedIn = (Supabase.instance.client.auth.currentUser != null);
+              loggedIn = (user != null);
             }
             else {
               // if the data exist == logged in
@@ -52,15 +81,11 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
                 return SizedBox();
               }
 
-              return Padding(
-                padding: EdgeInsets.only(right: 16.0),
-                  child: IconButton(
-                  onPressed: () => context.push("/cart"),
-                  icon: Icon(Icons.shopping_cart),
-                  tooltip: "Cart",
-                  color: Theme.of(context).colorScheme.onPrimary,
-                )
-              );
+              // fetch cart items first
+              CartHandler cartHandler = CartHandler(user!.id);
+              cartHandler.fetchCart();
+
+              return _buildCartIcon(context, user);
             }
 
             return Padding(
