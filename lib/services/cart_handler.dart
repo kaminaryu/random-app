@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:i_bazaar/models/cart_item.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 const _storageKey = "cart_items";
 
@@ -67,6 +68,32 @@ class CartHandler {
 
     _cartDirectory[userId]!.removeWhere((cartItem) => cartItem.itemId == itemId);
     await saveToStorage();
+  }
+ 
+
+  Future<void> recordPuchases({
+    required String userId,
+    required String itemId,
+    required int amount,
+  }) async {
+    final SupabaseClient supabase = Supabase.instance.client;
+
+    try {
+      await supabase
+        .from("purchases")
+        .insert({
+          "item_id": itemId,
+          "user_id": userId,
+          "amount": amount,
+        });
+    }
+    on PostgrestException catch (err) {
+      debugPrint("Error when recording purchases for item:");
+      debugPrint("itemId: $itemId");
+      debugPrint("userId: $userId");
+      debugPrint(err.message);
+    }
+    return;
   }
 
 

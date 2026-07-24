@@ -28,6 +28,36 @@ class _CartScreenState extends State<CartScreen> {
     _fetchCart();
   }
 
+  double get _grandTotal {
+    double total = 0.0;
+    List<Item> selectedItems = _itemsInCart.where((item) => _selectedItemIds.contains(item.id)).toList();
+
+    for (final item in selectedItems) {
+      final CartItem? cartItem = getItemById(item.id);
+      if (cartItem == null) continue;
+
+      total += item.price * cartItem.amount;
+    }
+    return total;
+  }
+
+  int get _totalSelectedItems {
+    List<Item> selectedItems = _itemsInCart.where((item) => _selectedItemIds.contains(item.id)).toList();
+    return selectedItems.length;
+  }
+
+
+  CartItem? getItemById(String itemId) {
+    // find the item inside the cart for amount in cart
+    final Iterable<CartItem> itemsWithTheId = _cart.where((cartItem) => cartItem.itemId == itemId);
+
+    if (itemsWithTheId.isEmpty) return null; // check if the item is not in cart i.o.w item entry is deleted from cart (i.o.w == in other words)
+
+    return itemsWithTheId.first;
+  }
+
+
+
   Future<void> _fetchCart() async {
     final user = Supabase.instance.client.auth.currentUser;
     if (user == null) return;
@@ -66,33 +96,15 @@ class _CartScreenState extends State<CartScreen> {
   }
 
 
-  double get _grandTotal {
-    double total = 0.0;
-    List<Item> selectedItems = _itemsInCart.where((item) => _selectedItemIds.contains(item.id)).toList();
-
-    for (final item in selectedItems) {
-      // find the item inside the cart for amount in cart
-      final List<CartItem> cartItem = _cart.where((cartItem) => cartItem.itemId == item.id).toList();
-      if (cartItem.isEmpty) continue; // check if the item is not in cart a.k.a item entry is deleted from cart
-
-      total += item.price * cartItem.first.amount;
-    }
-    return total;
-  }
-
-  int get _totalSelectedItems {
-    List<Item> selectedItems = _itemsInCart.where((item) => _selectedItemIds.contains(item.id)).toList();
-    return selectedItems.length;
-  }
-
-
   Future<void> _changeAmountInCart(Item item, int amountDelta) async {
     final user = Supabase.instance.client.auth.currentUser;
     if (user == null) return;
 
     setState(() {
       // get the cart item via ID
-      final CartItem cartItem = _cart.where((cartItem) => cartItem.itemId == item.id).first;
+      final CartItem? cartItem = getItemById(item.id);
+      if (cartItem == null) return;
+
       cartItem.amount += amountDelta;
     });
 
@@ -113,21 +125,32 @@ class _CartScreenState extends State<CartScreen> {
 
   Future<void> _checkout() async {
     final SupabaseClient supabase = Supabase.instance.client;
+    final User? user = supabase.auth.currentUser;
+ 
+    if (user == null) throw "User is not logged in";
+
+    final CartHandler cartHandler = CartHandler(user.id);
+
     List<Item> selectedItems = _itemsInCart.where((item) => _selectedItemIds.contains(item.id)).toList();
     List<Map<String, dynamic>> checkoutItems = [];
 
+    // we putting selected items into an object/map
     for (final item in selectedItems) {
       // find the item inside the cart
-      final List<CartItem> cartItem = _cart.where((cartItem) => cartItem.itemId == item.id).toList();
-      if (cartItem.isEmpty) continue; // check if the item is not in cart a.k.a item entry is deleted from cart
+      final CartItem? cartItem = getItemById(item.id);
+      if (cartItem == null) return;
 
-      checkoutItems.add({'id': item.id, 'qty': cartItem.first.amount});
+      checkoutItems.add({'id': item.id, 'qty': cartItem.amount});
     }
 
     try {
       await supabase.rpc('checkout_cart', params: {'items': checkoutItems});
 
       for (final item in selectedItems) {
+        final CartItem? cartItem = getItemById(item.id);
+        if (cartItem == null) continue;
+
+        cartHandler.recordPuchases(userId: user.id, itemId: item.id, amount: cartItem.amount);
         _deleteCartItem(item.id);
       }
     } on PostgrestException catch (e) {
