@@ -31,7 +31,7 @@ class _ListingsScreenState extends State<ListingsScreen> {
     _futureFunction = CatalogHandler.fetchRangedItems(
       page: _page,
       sortingOption: SortingOptions.uploadDate,
-      userId: userId,
+      sellerId: userId,
     );
   }
 
@@ -48,11 +48,7 @@ class _ListingsScreenState extends State<ListingsScreen> {
 
     // rebuild
     setState(() {
-      _futureFunction = CatalogHandler.fetchRangedItems(
-        page: _page,
-        sortingOption: SortingOptions.uploadDate,
-        userId: userId,
-      );
+      _fetchListing();
     });
   }
 

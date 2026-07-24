@@ -46,7 +46,7 @@ class ListingHandler {
           "short_desc": shortDesc,
           "stock": stock,
           "is_public": isPublic,
-          "user_id": sellerId,
+          "seller_id": sellerId,
         }); //.select("*, user_profiles(*)");
     }
     catch (e) {
@@ -98,10 +98,10 @@ class ListingHandler {
           "short_desc": shortDesc,
           "stock": stock,
           "is_public": isPublic,
-          "user_id": sellerId,
+          "seller_id": sellerId,
         })
         .eq("id", itemId)
-        .select("*, user_profiles(*)");
+        .select("*, user_profiles!catalog_seller_id_fkey(*)"); // ! forces supabase to use the catalog direct foreign key instead of traversing through rating
 
       return (response)
         .map((row) => Item.fromMap(row))

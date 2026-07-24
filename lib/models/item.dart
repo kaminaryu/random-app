@@ -45,7 +45,7 @@ class Item {
       raters:     row["raters"],
       amountSold: row["amount_sold"],
       createdAt:  DateTime.parse(row["item_created_at"]),
-      sellerId:   row["user_id"],
+      sellerId:   row["seller_id"],
       sellerName: row["user_profiles"]?["user_name"] ?? row["user_name"] ?? "Unknown User",
     );
   }
@@ -58,12 +58,12 @@ class Item {
       "desc": desc,
       "short_desc": shortDesc,
       "stock": stock,
-      // "amountInCart": amountInCart,
       "is_public": isPublic,
       "rating": rating,
+      "raters": raters,
       "amount_sold": amountSold,
       "item_created_at": createdAt.toIso8601String(),
-      "user_id": sellerId,
+      "seller_id": sellerId,
       "user_name": sellerName,
     };
   }

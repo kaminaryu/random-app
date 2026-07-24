@@ -25,7 +25,7 @@ class CatalogHandler {
     required int page,
     required SortingOptions sortingOption,
     bool isAscending = false,
-    String? userId
+    String? sellerId
   })
   async {
     final List<Map<String, dynamic>> response;
@@ -35,19 +35,18 @@ class CatalogHandler {
     final start = (page - 1) * pageSize;
     final end   = start + (pageSize - 1);
 
-    // if requested for specufic user's
-    if (userId != null) {
+    // if requested for specific user's
+    if (sellerId != null) {
       // check if the query if cached
-      queryKey = CacheHandler.generateQuerykey(sortingOption: sortingOption, filter: "UserId($userId)" ,page: page);
-
+      queryKey = CacheHandler.generateQuerykey(sortingOption: sortingOption, filter: "SellerId($sellerId)" ,page: page);
       final List<Item>? queryInCache = CacheHandler.findQueryInCache(queryKey);
 
       if (queryInCache != null) return queryInCache;
 
       response = await supabase
         .from("catalog")
-        .select("*, user_profiles(*)")
-        .eq("user_id", userId)
+        .select("*, user_profiles!catalog_seller_id_fkey(*)") // ! forces supabase to use the catalog direct foreign key instead of traversing through rating
+        .eq("seller_id", sellerId)
         .order(sortingOption.queryColumn, ascending: isAscending)
         .range(start, end);
     }
@@ -60,7 +59,7 @@ class CatalogHandler {
 
       response = await supabase
         .from("catalog")
-        .select("*, user_profiles(*)")
+        .select("*, user_profiles!catalog_seller_id_fkey(*)") // ! forces supabase to use the catalog direct foreign key instead of traversing through rating
         .eq("is_public", true)
         .order(sortingOption.queryColumn, ascending: isAscending)
         .range(start, end);
@@ -138,7 +137,7 @@ class CatalogHandler {
 
     final List<Map<String, dynamic>> response = await supabase
       .from("catalog")
-      .select("*, user_profiles(*)")
+      .select("*, user_profiles!catalog_seller_id_fkey(*)") // ! forces supabase to use the catalog direct foreign key instead of traversing through rating
       .eq("id", itemId);
 
     final Map<String, dynamic>? row = response.firstOrNull;
@@ -164,7 +163,7 @@ class CatalogHandler {
 
     final response = await Supabase.instance.client
       .from('catalog')
-      .select("*, user_profiles(*)")
+      .select("*, user_profiles!catalog_seller_id_fkey(*)") // ! forces supabase to use the catalog direct foreign key instead of traversing through rating
       .inFilter('id', itemIds);
 
     return response
