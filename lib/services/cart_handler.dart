@@ -71,30 +71,6 @@ class CartHandler {
   }
  
 
-  Future<void> recordPuchases({
-    required String userId,
-    required String itemId,
-    required int amount,
-  }) async {
-    final SupabaseClient supabase = Supabase.instance.client;
-
-    try {
-      await supabase
-        .from("purchases")
-        .insert({
-          "item_id": itemId,
-          "user_id": userId,
-          "amount": amount,
-        });
-    }
-    on PostgrestException catch (err) {
-      debugPrint("Error when recording purchases for item:");
-      debugPrint("itemId: $itemId");
-      debugPrint("userId: $userId");
-      debugPrint(err.message);
-    }
-    return;
-  }
 
 
   // these two are static cuz the cart needs to sync across instances

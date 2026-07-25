@@ -62,10 +62,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ThemeCard(theme),
             const SizedBox(height: 12),
 
-            _buildAdspaceCard(theme),
+            _buildActionCard(theme),
             const SizedBox(height: 12),
 
-            _buildInfoCard(theme),
+            _buildInfoCards(theme),
             const SizedBox(height: 12),
 
             _buildLogoutCard(theme),
@@ -116,19 +116,37 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
 
 
-  Widget _buildAdspaceCard(ThemeData theme) {
+  Widget _buildActionCard(ThemeData theme) {
     return Card(
       clipBehavior: Clip.antiAlias,
-      child: ListTile(
-        leading: const Icon(Icons.campaign),
-        title: const Text('Buy Adspace'),
-        trailing: const Icon(Icons.chevron_right),
-        onTap: () => context.push('/adspace'),
-      ),
+      child: Column(
+        children: [
+          ListTile(
+            leading: const Icon(Icons.campaign),
+            title: const Text('Buy Adspace'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => context.push('/adspace'),
+          ),
+
+          ListTile(
+            leading: const Icon(Icons.history),
+            title: const Text('Check Purchase History'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => context.push('/purchase-history'),
+          ),
+
+          ListTile(
+            leading: const Icon(Icons.star),
+            title: const Text('Rate Products'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => context.push('/rate-products'),
+          ),
+        ],
+      )
     );
   }
 
-  Widget _buildInfoCard(ThemeData theme) {
+  Widget _buildInfoCards(ThemeData theme) {
     return Card(
       clipBehavior: Clip.antiAlias,
       child: Column(

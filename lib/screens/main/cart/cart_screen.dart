@@ -4,6 +4,7 @@ import 'package:i_bazaar/models/item.dart';
 import 'package:i_bazaar/screens/main/cart/widget/cart_card.dart';
 import 'package:i_bazaar/services/cart_handler.dart';
 import 'package:i_bazaar/services/catalog_handler.dart';
+import 'package:i_bazaar/services/purchases_handler.dart';
 import 'package:i_bazaar/widgets/main/main_app_bar.dart';
 import 'package:i_bazaar/widgets/not_signed_in_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -129,7 +130,7 @@ class _CartScreenState extends State<CartScreen> {
  
     if (user == null) throw "User is not logged in";
 
-    final CartHandler cartHandler = CartHandler(user.id);
+    final PurchasesHandler purchasesHandler = PurchasesHandler();
 
     List<Item> selectedItems = _itemsInCart.where((item) => _selectedItemIds.contains(item.id)).toList();
     List<Map<String, dynamic>> checkoutItems = [];
@@ -150,7 +151,7 @@ class _CartScreenState extends State<CartScreen> {
         final CartItem? cartItem = getItemById(item.id);
         if (cartItem == null) continue;
 
-        cartHandler.recordPuchases(userId: user.id, itemId: item.id, amount: cartItem.amount);
+        purchasesHandler.recordPuchases(userId: user.id, itemId: item.id, amount: cartItem.amount);
         _deleteCartItem(item.id);
       }
     } on PostgrestException catch (e) {

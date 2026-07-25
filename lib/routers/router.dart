@@ -1,7 +1,7 @@
 import 'package:go_router/go_router.dart';
 import 'package:i_bazaar/models/item.dart';
 import 'package:i_bazaar/screens/auth/register_screen.dart';
-import 'package:i_bazaar/screens/main/adspace_screen.dart';
+import 'package:i_bazaar/screens/profile/adspace_screen.dart';
 import 'package:i_bazaar/screens/main/cart/cart_screen.dart';
 import 'package:i_bazaar/screens/main/create_listing/create_listing_screen.dart';
 import 'package:i_bazaar/screens/main/edit_listing/edit_listing_screen.dart';
@@ -10,17 +10,23 @@ import 'package:i_bazaar/screens/auth/login_screen.dart';
 import 'package:i_bazaar/screens/main/item/item_screen.dart';
 import 'package:i_bazaar/screens/main/listings/listings_screen.dart';
 import 'package:i_bazaar/screens/main/main_screen.dart';
-import 'package:i_bazaar/screens/main/profile_screen.dart';
+import 'package:i_bazaar/screens/profile/profile_screen.dart';
 import 'package:i_bazaar/screens/main/search/search_screen.dart';
+import 'package:i_bazaar/screens/profile/purchase_history_screen.dart';
+import 'package:i_bazaar/screens/profile/rate_products.dart';
 
 final router = GoRouter(
   initialLocation: "/",
   routes: [
     GoRoute(path: "/login", builder: (context, state) => LoginScreen()),
     GoRoute(path: "/register", builder: (context, state) => RegisterScreen()),
-    GoRoute(path: "/adspace", builder: (context, state) => const AdspaceScreen()),
     GoRoute(path: "/create-listing", builder: (context, state) => const CreateListingScreen()),
     GoRoute(path: "/cart", builder: (context, state) => const CartScreen()),
+
+    // ProfileScreen
+    GoRoute(path: "/adspace", builder: (context, state) => const AdspaceScreen()),
+    GoRoute(path: "/purchase-history", builder: (context, state) => const PurchaseHistoryScreen()),
+    GoRoute(path: "/rate-products", builder: (context, state) => const RateProductsScreen()),
 
 
     GoRoute(path: "/edit-listing", builder: (context, state) {
