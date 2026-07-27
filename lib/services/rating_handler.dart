@@ -29,7 +29,7 @@ class RatingHandler {
     try {
       await supabase
         .from("ratings")
-        .upsert({
+        .insert({
           "item_id": itemId,
           "user_id": userId,
           "rating": rating,
