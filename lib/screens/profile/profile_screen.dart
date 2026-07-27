@@ -129,13 +129,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
 
           ListTile(
-            leading: const Icon(Icons.history),
-            title: const Text('Check Purchase History'),
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () => context.push('/purchase-history'),
-          ),
-
-          ListTile(
             leading: const Icon(Icons.star),
             title: const Text('Rate Products'),
             trailing: const Icon(Icons.chevron_right),

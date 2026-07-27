@@ -128,7 +128,7 @@ class CatalogHandler {
   }
 
 
-  static Future<Item> fetchItem(String itemId) async {
+  static Future<Item?> fetchItem(String itemId) async {
     // do not call db if item is already cached
     final Item? itemInCache = CacheHandler.findItemInCache(itemId);
 
@@ -142,9 +142,9 @@ class CatalogHandler {
 
     final Map<String, dynamic>? row = response.firstOrNull;
 
+    // item doesnt exist
     if (row == null) {
-      // change this to not raise exp
-      throw Exception("Item not found: $itemId");
+      return null;
     }
 
     final item = Item.fromMap(row);

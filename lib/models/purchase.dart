@@ -1,6 +1,3 @@
-import 'package:i_bazaar/services/cart_handler.dart';
-import 'package:i_bazaar/services/catalog_handler.dart';
-
 class Purchase {
   const Purchase({
     required this.purchaseId,
@@ -17,8 +14,6 @@ class Purchase {
   final DateTime purchaseAt;
 
   factory Purchase.fromMap(Map<String, dynamic> map) {
-    CatalogHandler.fetchItem(map["item_id"]);
-
     return Purchase(
       purchaseId: map["purchase_id"],
       itemId:     map["item_id"],

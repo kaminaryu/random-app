@@ -12,8 +12,7 @@ import 'package:i_bazaar/screens/main/listings/listings_screen.dart';
 import 'package:i_bazaar/screens/main/main_screen.dart';
 import 'package:i_bazaar/screens/profile/profile_screen.dart';
 import 'package:i_bazaar/screens/main/search/search_screen.dart';
-import 'package:i_bazaar/screens/profile/purchase_history_screen.dart';
-import 'package:i_bazaar/screens/profile/rate_products.dart';
+import 'package:i_bazaar/screens/profile/rate_products_screen.dart';
 
 final router = GoRouter(
   initialLocation: "/",
@@ -25,7 +24,6 @@ final router = GoRouter(
 
     // ProfileScreen
     GoRoute(path: "/adspace", builder: (context, state) => const AdspaceScreen()),
-    GoRoute(path: "/purchase-history", builder: (context, state) => const PurchaseHistoryScreen()),
     GoRoute(path: "/rate-products", builder: (context, state) => const RateProductsScreen()),
 
 
@@ -43,7 +41,7 @@ final router = GoRouter(
     ),
 
     ShellRoute(
-      builder: (context, state, child) => MainScreen(/* currentPath: state.uri.toString(), */ child: child),
+      builder: (context, state, child) => MainScreen(child: child),
       routes: [
         GoRoute(path: "/",         pageBuilder: (context, state)  => NoTransitionPage(child: HomeScreen())),
         GoRoute(path: "/search",   pageBuilder: (context, state)  => NoTransitionPage(child: SearchScreen())),

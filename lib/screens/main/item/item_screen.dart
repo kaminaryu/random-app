@@ -17,23 +17,23 @@ class ItemScreen extends StatefulWidget {
 }
 
 class _ItemScreenState extends State<ItemScreen> {
-  late Future<Item> _itemFuture;
+  late Future<Item?> _itemFuture;
 
   @override
   void initState() {
     super.initState();
-    _itemFuture = CatalogHandler.fetchItem(widget.itemId);
+    _refresh();
   }
 
   Future<void> _refresh() async {
-    setState(() {
-      // remove the cache and refresh the page
-      CacheHandler.removeItemFromCache(widget.itemId);
-      _itemFuture = CatalogHandler.fetchItem(widget.itemId);
-    });
+    // remove the cache and refresh the page
+    CacheHandler.removeItemFromCache(widget.itemId);
+    _itemFuture = CatalogHandler.fetchItem(widget.itemId);
 
-    // waut til finish refreshing
+    // wait for the future to be fully fetched (so that RefreshIndicator() doesnt ping "done" early)
     await _itemFuture;
+
+    setState(() {});
   }
 
   Widget _buildItemScreen(Item item, ThemeData theme) {
@@ -52,7 +52,7 @@ class _ItemScreenState extends State<ItemScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<Item>(
+    return FutureBuilder<Item?>(
       future: _itemFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
