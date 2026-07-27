@@ -8,6 +8,17 @@ class ItemCard extends StatelessWidget {
 
   final Item item;
 
+  String _compactNumbers(int num) {
+    if (num >= 1_000_000) {
+      return "${(num / 1_000_000).toStringAsFixed(2)}M";
+    }
+    else if (num >= 1000) {
+      return "${(num / 1000).toStringAsFixed(2)}K";
+    }
+
+    return num.toString();
+  }
+
   Widget _buildThumbnail() {
     return AspectRatio(
       aspectRatio: 1.0,
@@ -40,7 +51,7 @@ class ItemCard extends StatelessWidget {
               size: 12,
             ),
             Text(
-              "${item.rating} (000)",
+              "${item.rating} (${_compactNumbers(item.raters)})",
               style: TextStyle(
                 color: Colors.amber,
                 fontWeight: FontWeight.w300,
