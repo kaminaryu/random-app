@@ -41,7 +41,7 @@ class _ListingsScreenState extends State<ListingsScreen> {
     // remove query from cache before rebuilding
     final String queryKey = CacheHandler.generateQuerykey(
       sortingOption: SortingOptions.uploadDate,
-      filter: "UserId($userId)",
+      filter: "SellerId($userId)",
       page: _page,
     );
     CacheHandler.removeQueryFromCache(queryKey);
