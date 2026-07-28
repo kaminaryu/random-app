@@ -2,6 +2,19 @@ import 'package:flutter/rendering.dart';
 import 'package:i_bazaar/models/item.dart';
 import 'package:i_bazaar/services/catalog_handler.dart';
 
+// this is for query that have filters like sellerId and price range
+class QueryFilterKey {
+  static String seller(String sellerId) {
+    return "seller($sellerId)";
+  }
+
+  static String priceRange(double startPrice, double endPrice) {
+    return "priceRange($startPrice,$endPrice)";
+  }
+}
+
+
+
 class CacheHandler {
   // NOTE: turn ts into its own class
   // dynamic: {"cacheTime": DateTime, "item": Item}
@@ -64,8 +77,8 @@ class CacheHandler {
   //  (i need to make a better system than ts lmao)
   //  UserId($userId)
   //  PriceRange($start,$end)
-  static String generateQuerykey({required SortingOptions sortingOption, String filter="", required int page, String query=""}) {
-    return "$sortingOption|$filter|$page|$query";
+  static String generateQueryKey({required SortingOptions sortingOption, isAscending=false, String filter="", required int page, String query=""}) {
+    return "$sortingOption|$isAscending|$filter|$page|$query";
   }
 
 

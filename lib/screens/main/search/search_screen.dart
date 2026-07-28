@@ -32,30 +32,35 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   void dispose() {
-    _searchController.dispose();
     super.dispose();
+    _searchController.dispose();
   }
 
   Future<void> _search() async {
-    setState(() {
-      _searchFuture = CatalogHandler.searchRangedItems(
-        page: _page,
-        query: _searchController.text,
-        priceStart: _priceRange.start,
-        priceEnd: _priceRange.end,
-        sortingOption: _selectedSortingOption,
-        isAscending: _isAscending,
-      );
-    });
+    _searchFuture = CatalogHandler.searchRangedItems(
+      page: _page,
+      query: _searchController.text,
+      priceStart: _priceRange.start,
+      priceEnd: _priceRange.end,
+      sortingOption: _selectedSortingOption,
+      isAscending: _isAscending,
+    );
+
+    await _searchFuture;
+
+    setState(() {});
   }
 
   Future<void> _refresh() async {
     final double priceStart = _priceRange.start;
     final double priceEnd   = _priceRange.end;
 
-    final String queryKey = CacheHandler.generateQuerykey(
+    debugPrint("retarded nigger");
+
+    final String queryKey = CacheHandler.generateQueryKey(
       sortingOption: _selectedSortingOption,
-      filter: "PriceRange($priceStart,$priceEnd)",
+      isAscending: _isAscending,
+      filter: QueryFilterKey.priceRange(priceStart, priceEnd),
       page: _page,
       query: _searchController.text,
     );

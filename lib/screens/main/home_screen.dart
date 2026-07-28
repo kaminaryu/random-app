@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:i_bazaar/models/item.dart';
 import 'package:i_bazaar/services/cache_handler.dart';
-import 'package:i_bazaar/services/cart_handler.dart';
 import 'package:i_bazaar/services/catalog_handler.dart';
 import 'package:i_bazaar/widgets/homepage/hero.dart';
 import 'package:i_bazaar/widgets/homepage/item_card.dart';
 import 'package:i_bazaar/widgets/homepage/section_title.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -37,7 +34,10 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _refresh() async {
     setState(() {
       // refresh the grid
-      final String queryKey = CacheHandler.generateQuerykey(sortingOption: SortingOptions.uploadDate, page: _page);
+      final String queryKey = CacheHandler.generateQueryKey(
+        sortingOption: SortingOptions.uploadDate,
+        page: _page
+      );
       CacheHandler.removeQueryFromCache(queryKey);
 
       _futureFunction = CatalogHandler.fetchRangedItems(

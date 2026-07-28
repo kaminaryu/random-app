@@ -36,12 +36,15 @@ class _ListingsScreenState extends State<ListingsScreen> {
   }
 
   Future<void> _refresh() async {
-    final String userId = Supabase.instance.client.auth.currentUser!.id;
+    final SupabaseClient supabase = Supabase.instance.client;
+    final User? user = supabase.auth.currentUser;
+
+    if (user == null) throw "User is not logged in";
 
     // remove query from cache before rebuilding
-    final String queryKey = CacheHandler.generateQuerykey(
+    final String queryKey = CacheHandler.generateQueryKey(
       sortingOption: SortingOptions.uploadDate,
-      filter: "SellerId($userId)",
+      filter: QueryFilterKey.seller(user.id),
       page: _page,
     );
     CacheHandler.removeQueryFromCache(queryKey);

@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:i_bazaar/models/item.dart';
 import 'package:i_bazaar/services/cache_handler.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -21,6 +22,8 @@ class CatalogHandler {
 
   static final supabase = Supabase.instance.client;
 
+
+  // WARNING: i HATE this function so much, but im too lazy to touch and fix ts
   static Future<List<Item>> fetchRangedItems({
     required int page,
     required SortingOptions sortingOption,
@@ -38,7 +41,12 @@ class CatalogHandler {
     // if requested for specific user's
     if (sellerId != null) {
       // check if the query if cached
-      queryKey = CacheHandler.generateQuerykey(sortingOption: sortingOption, filter: "SellerId($sellerId)" ,page: page);
+      queryKey = CacheHandler.generateQueryKey(
+        sortingOption: sortingOption,
+        isAscending: isAscending,
+        filter: QueryFilterKey.seller(sellerId),
+        page: page
+      );
       final List<Item>? queryInCache = CacheHandler.findQueryInCache(queryKey);
 
       if (queryInCache != null) return queryInCache;
@@ -52,7 +60,11 @@ class CatalogHandler {
     }
     else {
       // check if the query if cached
-      queryKey = CacheHandler.generateQuerykey(sortingOption: sortingOption, page: page);
+      queryKey = CacheHandler.generateQueryKey(
+        sortingOption: sortingOption,
+        isAscending: isAscending,
+        page: page
+      );
       final List<Item>? queryInCache = CacheHandler.findQueryInCache(queryKey);
 
       if (queryInCache != null) return queryInCache;
@@ -95,28 +107,41 @@ class CatalogHandler {
     final start = (page - 1) * pageSize;
     final end   = start + (pageSize - 1);
 
+    // make the price end range "infinite" if the user slides to the end
+    if (priceEnd == 1000) priceEnd = 999_999_999;
+
     // check if the query if cached
-    final queryKey = CacheHandler.generateQuerykey(sortingOption: sortingOption, filter: "PriceRange($priceStart,$priceEnd)", page: page, query: query);
+    final queryKey = CacheHandler.generateQueryKey(
+      sortingOption: sortingOption,
+      isAscending: isAscending,
+      filter: QueryFilterKey.priceRange(priceStart, priceEnd),
+      page: page, 
+      query: query
+    );
     final List<Item>? queryInCache = CacheHandler.findQueryInCache(queryKey);
 
     if (queryInCache != null) return queryInCache;
 
-    // make the price end range "infinite" if the user slides to the end
-    if (priceEnd == 1000) priceEnd = 999_999_999;
+    final List<Map<String, dynamic>> response;
 
-
-    final List<Map<String, dynamic>> response = await supabase.rpc(
-      "search_catalogs",
-      params: {
-        'search_query': query,
-        'sorting_option': sortingOption.queryColumn,
-        'ascending': isAscending,
-        'price_start': priceStart,
-        'price_end': priceEnd,
-        'page_offset': start,
-        'page_limit': end - start + 1,
-      }
-    );
+    try {
+      response = await supabase.rpc(
+        "search_catalogs",
+        params: {
+          'search_query': query,
+          'sorting_option': sortingOption.queryColumn,
+          'ascending': isAscending,
+          'price_start': priceStart,
+          'price_end': priceEnd,
+          'page_offset': start,
+          'page_limit': end - start + 1,
+        }
+      );
+    }
+    on PostgrestException catch (err) {
+      debugPrint("Something went wrong on seaching: ${err.message}");
+      rethrow;
+    }
 
     final queryList = response
       .map((row) => Item.fromMap(row))
